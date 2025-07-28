@@ -41,10 +41,10 @@ Install the package using your preferred environment:
 
    Install system dependencies:
 
-   * conda/mamba/micromamba
+   * conda/mamba
 
    ```sh
-   just install-conda conda # Or, mamba/micromamba
+   just install-conda <conda|mamba|micromamba>
    conda activate cosmos-predict2
    ```
 
