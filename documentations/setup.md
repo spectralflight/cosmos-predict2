@@ -44,7 +44,7 @@ Install the package using your preferred environment:
    * conda/mamba/micromamba
 
    ```sh
-   just install-conda conda # Alternatives: 'mamba', 'micromamba'
+   just install-conda conda # Or, mamba/micromamba
    conda activate cosmos-predict2
    ```
 
