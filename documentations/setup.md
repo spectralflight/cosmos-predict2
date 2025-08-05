@@ -111,6 +111,7 @@ Please make sure you have access to Docker on your machine and the [NVIDIA Conta
    [CONTAINER_NAME]
 
    # Verify setup inside container
+   export PYTHONPATH=$(pwd)
    python /workspace/scripts/test_environment.py
    ```
 
@@ -121,39 +122,31 @@ Please make sure you have access to Docker on your machine and the [NVIDIA Conta
 1. Get a [Hugging Face Access Token](https://huggingface.co/settings/tokens) with `Read` permission
 2. Install [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli): `uv tool install -U "huggingface_hub[cli]"`
 3. Login: `hf auth login`
-4. The [Llama-Guard-3-8B terms](https://huggingface.co/meta-llama/Llama-Guard-3-8B) must be accepted. Approval will be required before Llama Guard 3 can be downloaded.
-5. Download models:
+4. Accept the [Llama-Guard-3-8B terms](https://huggingface.co/meta-llama/Llama-Guard-3-8B).
 
-| Models | Link | Download Command | Notes |
-|--------|------|------------------|-------|
-| Cosmos-Predict2-0.6B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-0.6B-Text2Image) | `./scripts/download_checkpoints.py --model_types text2image --model_sizes 0.6B` | N/A |
-| Cosmos-Predict2-2B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Text2Image) | `./scripts/download_checkpoints.py --model_types text2image --model_sizes 2B` | N/A |
-| Cosmos-Predict2-14B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Text2Image) | `./scripts/download_checkpoints.py --model_types text2image --model_sizes 14B` | N/A |
-| Cosmos-Predict2-2B-Video2World | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Video2World) | `./scripts/download_checkpoints.py --model_types video2world --model_sizes 2B` | Download 720P, 16FPS by default. Supports 480P and 720P resolution. Supports 10FPS and 16FPS |
-| Cosmos-Predict2-14B-Video2World | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Video2World) | `./scripts/download_checkpoints.py --model_types video2world --model_sizes 14B` | Download 720P, 16FPS by default. Supports 480P and 720P resolution. Supports 10FPS and 16FPS |
-| Cosmos-Predict2-2B-Sample-Action-Conditioned | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned) | `./scripts/download_checkpoints.py --model_types sample_action_conditioned` | Supports 480P and 4FPS. |
-| Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1 | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1) | `./scripts/download_checkpoints.py --model_types sample_gr00t_dreams_gr1` | Supports 480P and 16FPS. |
-| Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID) | `./scripts/download_checkpoints.py --model_types sample_gr00t_dreams_droid` | Supports 480P and 16FPS. |
+To download a specific model:
 
-For Video2World model with different resolution and FPS, you can pass `resolution` and `fps` flag to control which model checkpoint to download. For example, if you want a 2B model with 480P and 10FPS, you can do
+| Models | Link | Download Arguments | Notes |
+|--------|------|--------------------|-------|
+| Cosmos-Predict2-0.6B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-0.6B-Text2Image) | `--model_types text2image --model_sizes 0.6B` | N/A |
+| Cosmos-Predict2-2B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Text2Image) | `--model_types text2image --model_sizes 2B` | N/A |
+| Cosmos-Predict2-14B-Text2Image | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Text2Image) | `--model_types text2image --model_sizes 14B` | N/A |
+| Cosmos-Predict2-2B-Video2World | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Video2World) | `--model_types video2world --model_sizes 2B` | Download 720P, 16FPS by default. Supports 480P and 720P resolution. Supports 10FPS and 16FPS |
+| Cosmos-Predict2-14B-Video2World | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Video2World) | `--model_types video2world --model_sizes 14B` | Download 720P, 16FPS by default. Supports 480P and 720P resolution. Supports 10FPS and 16FPS |
+| Cosmos-Predict2-2B-Sample-Action-Conditioned | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned) | `--model_types sample_action_conditioned` | Supports 480P and 4FPS. |
+| Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1 | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1) | `--model_types sample_gr00t_dreams_gr1` | Supports 480P and 16FPS. |
+| Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID | [🤗 Huggingface](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID) | `--model_types sample_gr00t_dreams_droid` | Supports 480P and 16FPS. |
 
-```bash
-./scripts/download_checkpoints.py --model_types video2world --model_sizes 2B --resolution 480 --fps 10
+To download all the checkpoints (requires ~250GB of disk space), run:
+
+```shell
+./scripts/download_checkpoints.py
 ```
 
-Tips: `model_types`, `model_sizes`, `fps` and `resolution` supports multiple values. So if you want a mega command to download {2,14}B Video2World models with {10,16} FPS and {480,720}P, you can download 2x2x2=8 models via
+To see the full list of options, run:
 
-```bash
-./scripts/download_checkpoints.py --model_types video2world --model_sizes 2B 14B --resolution 480 720 --fps 10 16
-```
-
-You can pass `--checkpoint_dir <path to ckpt>` if you want to control where to put the checkpoints.
-
-To download models with [sparse attention](performance.md#sparse-attention-powered-by-natten), run the
-script with the `--natten` option:
-
-```bash
-./scripts/download_checkpoints.py --model_types video2world --model_sizes 2B 14B --resolution 720 --fps 10 16 --natten
+```shell
+./scripts/download_checkpoints.py --help
 ```
 
 ## Troubleshooting
