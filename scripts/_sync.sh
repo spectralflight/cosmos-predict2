@@ -15,8 +15,10 @@ VENV="$(pwd)/.venv"
 PATH="$VENV/bin:$PATH"
 
 # Install build dependencies
-extras="--extra $(<"$VENV/cuda-version")"
-uv sync --extra build $extras
+CUDA_VERSION_SHORT="$(<"$VENV/cuda-version")"
+uv pip install --reinstall "torch==2.6.0" --extra-index-url https://download.pytorch.org/whl/$CUDA_VERSION_SHORT
+extras="--extra $CUDA_VERSION_SHORT"
+uv sync --only-group build $extras
 
 # Set build environment variables
 eval $(python -c "
@@ -30,8 +32,11 @@ export UV_CACHE_DIR="$(uv cache dir)/torch${TORCH_VERSION//./}_cu${CUDA_VERSION/
 if [ -f "$VENV/bin/nvcc" ]; then
     echo "Using conda CUDA"
     SITE_PACKAGES="$(python -c "import site; print(site.getsitepackages()[0])")"
-    ln -sf "$SITE_PACKAGES"/nvidia/*/include/* "$VENV/include/"
+    # ln -sf "$SITE_PACKAGES"/nvidia/*/include/* "$VENV/include/"
+    ln -sf "$SITE_PACKAGES"/nvidia/{nvtx,nvrtc}/include/* "$VENV/include/"
     export CUDA_HOME="$VENV"
+    export CUDA_PATH="$CUDA_HOME"
+    export CUDNN_PATH="$CUDA_HOME"
 else
     echo "Using system CUDA"
     export CUDA_HOME="/usr/local/cuda-$CUDA_VERSION"
@@ -54,7 +59,7 @@ export NVTE_FRAMEWORK=pytorch
 for extra in $all_extras; do \
     echo "Compiling $extra. This may take a while..."; \
     extras+=" --extra $extra"; \
-    uv sync --extra build $extras; \
+    uv sync --group build $extras; \
 done
 
 # Remove build dependencies

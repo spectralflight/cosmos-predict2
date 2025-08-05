@@ -3,12 +3,12 @@ requires = ["uv_build>=0.7.21,<0.8.0"]
 build-backend = "uv_build"
 
 [project]
-name = "cosmos_predict2"
+name = "cosmos-predict2"
 version = "1.0.3"
 authors = [
   {name = "NVIDIA Corporation"},
 ]
-description = "Cosmos World Foundation Model"
+description = "Cosmos Predict2 World Foundation Model"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
@@ -71,7 +71,6 @@ build = [
   "wheel",
 ]
 cu126 = [
-  "nvidia-nvtx-cu12==12.6.*",
   "torch==2.6.0",
   "torchvision==0.21.0",
 ]

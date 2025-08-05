@@ -1,3 +1,14 @@
+#!/usr/bin/env -S uv run --script
+#
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "huggingface-hub",
+# ]
+# [tool.uv]
+# exclude-newer = "2025-07-31T00:00:00Z"
+# ///
+# 
 # SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
