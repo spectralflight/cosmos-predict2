@@ -6,13 +6,13 @@ training_extras := "apex"
 
 # Install inference in existing environment
 install cuda='cu126':
+    ./scripts/_sync.sh "{{ cuda }}" "{{ extras }}"
     echo {{ cuda }} > .venv/cuda-version
-    ./scripts/_sync.sh "{{ extras }}"
     ./.venv/bin/python scripts/test_environment.py
 
 # Install training in existing environment
 install-training:
-    ./scripts/_sync.sh "{{ extras }} {{ training_extras }}"
+    ./scripts/_sync.sh "$(cat .venv/cuda-version)" "{{ extras }} {{ training_extras }}"
     ./.venv/bin/python scripts/test_environment.py --training
 
 # Create a new conda environment
