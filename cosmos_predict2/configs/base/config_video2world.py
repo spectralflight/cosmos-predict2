@@ -18,6 +18,8 @@ from enum import Enum
 
 import attrs
 
+from cosmos_predict2.auxiliary import text_encoder
+from cosmos_predict2.text_encoders.text_encoder import TextEncoderConfig
 from cosmos_predict2.conditioner import BooleanFlag, ReMapkey, TextAttr, VideoConditioner
 from cosmos_predict2.configs.base.config_natten import (
     PREDICT2_VIDEO2WORLD_NET_2B_NATTEN_PARAMETERS,
@@ -71,7 +73,7 @@ class Video2WorldPipelineConfig:
     sigma_data: float = 1.0
     state_ch: int = 16
     state_t: int = 24
-    text_encoder_class: str = "T5"
+    text_encoder: TextEncoderConfig = attrs.field(factory=TextEncoderConfig)
     input_video_key: str = "video"
     input_image_key: str = "images"
     timestamps: SolverTimestampConfig = attrs.field(factory=SolverTimestampConfig)
@@ -148,7 +150,6 @@ PREDICT2_VIDEO2WORLD_PIPELINE_2B = Video2WorldPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
-    text_encoder_class="T5",
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         temporal_window=16,
@@ -239,7 +240,6 @@ PREDICT2_VIDEO2WORLD_PIPELINE_14B = Video2WorldPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
-    text_encoder_class="T5",
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         temporal_window=16,
@@ -333,7 +333,6 @@ PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_2B = Video2WorldPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
-    text_encoder_class="T5",
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         temporal_window=16,
@@ -396,7 +395,6 @@ PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_14B = Video2WorldPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
-    text_encoder_class="T5",
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         temporal_window=16,

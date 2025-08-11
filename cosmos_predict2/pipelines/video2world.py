@@ -29,7 +29,7 @@ from torch.distributed.fsdp import FSDPModule, fully_shard
 from tqdm import tqdm
 
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
-from cosmos_predict2.auxiliary.text_encoder import CosmosT5TextEncoder
+from cosmos_predict2.text_encoders.text_encoder import TextEncoder
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_video2world import ConditioningStrategy, Video2WorldPipelineConfig
 from cosmos_predict2.datasets.utils import VIDEO_RES_SIZE_INFO
@@ -250,7 +250,7 @@ def read_and_process_video(
 class Video2WorldPipeline(BasePipeline):
     def __init__(self, device: str = "cuda", torch_dtype: torch.dtype = torch.bfloat16):
         super().__init__(device=device, torch_dtype=torch_dtype)
-        self.text_encoder: CosmosT5TextEncoder = None
+        self.text_encoder: TextEncoder = None
         self.dit: torch.nn.Module = None
         self.dit_ema: torch.nn.Module = None
         self.tokenizer: TokenizerInterface = None
@@ -273,6 +273,9 @@ class Video2WorldPipeline(BasePipeline):
         load_ema_to_reg: bool = False,
         load_prompt_refiner: bool = False,
     ) -> Any:
+        # HACK
+        config.text_encoder.ckpt_path = text_encoder_path
+
         # Create a pipe
         pipe = Video2WorldPipeline(device=device, torch_dtype=torch_dtype)
         pipe.config = config
@@ -309,7 +312,7 @@ class Video2WorldPipeline(BasePipeline):
         # 4. Load text encoder
         if text_encoder_path:
             # inference
-            pipe.text_encoder = CosmosT5TextEncoder(device=device, cache_dir=text_encoder_path)
+            pipe.text_encoder = TextEncoder(config=config.text_encoder)
             pipe.text_encoder.to(device)
         else:
             # training
@@ -457,7 +460,9 @@ class Video2WorldPipeline(BasePipeline):
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        return self.text_encoder.encode_prompts(prompts, max_length=max_length, return_mask=return_mask)  # type: ignore
+        return self.text_encoder.compute_text_embeddings_online(
+            {"text": prompts}, input_caption_key="text"
+        )
 
     @torch.no_grad()
     def decode(self, latent: torch.Tensor) -> torch.Tensor:
