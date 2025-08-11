@@ -19,8 +19,7 @@ import pickle
 
 import numpy as np
 
-from cosmos_predict2.auxiliary.text_encoder import CosmosT5TextEncoder
-from imaginaire.constants import get_t5_model_dir
+from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder
 
 """example command
 python -m scripts.get_t5_embeddings_from_cosmos_nemo_assets --dataset_path datasets/cosmos_nemo_assets

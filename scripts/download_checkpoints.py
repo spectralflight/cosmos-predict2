@@ -156,9 +156,8 @@ def main(args):
                         allow_patterns=allow_patterns,
                     )
 
-            download(
-                f"nvidia/{MODEL_SIZE_MAPPING[size]}-{MODEL_TYPE_MAPPING['video2world']}", allow_patterns="tokenizer/*"
-            )
+            download(f"nvidia/{MODEL_SIZE_MAPPING[size]}-{MODEL_TYPE_MAPPING['video2world']}", allow_patterns="tokenizer/*")
+
         download("nvidia/Cosmos-Reason1-7B")
 
     if "multiview" in args.model_types:

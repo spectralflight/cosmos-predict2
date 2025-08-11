@@ -159,7 +159,6 @@ def setup_pipeline(args: argparse.Namespace):
     pipe = Video2WorldActionConditionedPipeline.from_config(
         config=config,
         dit_path=dit_path,
-        text_encoder_path=text_encoder_path,
         device="cuda",
         torch_dtype=torch.bfloat16,
         load_ema_to_reg=args.load_ema,

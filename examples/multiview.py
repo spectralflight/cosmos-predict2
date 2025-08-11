@@ -17,13 +17,8 @@ import argparse
 import json
 import os
 
-from imaginaire.constants import (
-    CosmosPredict2MultiviewFPS,
-    CosmosPredict2MultiviewModelSize,
-    CosmosPredict2MultiviewResolution,
-    get_cosmos_predict2_multiview_checkpoint,
-    get_t5_model_dir,
-)
+from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder
+from imaginaire.constants import CHECKPOINT_DIR, COSMOS_PREDICT2_MULTIVIEW_CHECKPOINT
 
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -66,13 +61,10 @@ def validate_input_file(input_path: str, num_conditional_frames: int) -> bool:
 
     return True
 
-
-def setup_pipeline(args: argparse.Namespace, text_encoder=None):
-    views = 7
-    frames = 29
-    config = get_cosmos_predict2_multiview_pipeline(
-        model_size=args.model_size, resolution=args.resolution, fps=args.fps, views=views, frames=frames
-    )
+def setup_pipeline(args: argparse.Namespace):
+    log.info(f"Using model size: {args.model_size}")
+    config = PREDICT2_MULTIVIEW_PIPELINE_2B_720P_10FPS_7VIEWS_29FRAMES
+    dit_path = "checkpoints/nvidia/Cosmos-Predict2-2B-Multiview/model.pt"
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:
@@ -80,13 +72,6 @@ def setup_pipeline(args: argparse.Namespace, text_encoder=None):
             model_size=args.model_size, resolution=args.resolution, fps=args.fps, views=views, frames=frames
         )
     log.info(f"Using dit_path: {dit_path}")
-
-    # Only set up text encoder path if no encoder is provided
-    text_encoder_path = None if text_encoder is not None else get_t5_model_dir()
-    if text_encoder is not None:
-        log.info("Using provided text encoder")
-    else:
-        log.info(f"Using text encoder from: {text_encoder_path}")
 
     misc.set_random_seed(seed=args.seed, by_rank=True)
     # Initialize cuDNN.
@@ -132,15 +117,10 @@ def setup_pipeline(args: argparse.Namespace, text_encoder=None):
     pipe = MultiviewPipeline.from_config(
         config=config,
         dit_path=dit_path,
-        text_encoder_path=text_encoder_path,
         device="cuda",
         torch_dtype=torch.bfloat16,
         load_prompt_refiner=config.prompt_refiner_config.enabled,
     )
-
-    # Set the provided text encoder if one was passed
-    if text_encoder is not None:
-        pipe.text_encoder = text_encoder
 
     return pipe
 

@@ -17,6 +17,8 @@ import argparse
 import json
 import os
 
+from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder
+
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -98,19 +100,25 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def setup_pipeline(args: argparse.Namespace, text_encoder=None) -> Text2ImagePipeline:
-    config = get_cosmos_predict2_text2image_pipeline(model_size=args.model_size, fast_tokenizer=args.use_fast_tokenizer)
+def setup_pipeline(args: argparse.Namespace) -> Text2ImagePipeline:
+    log.info(f"Using model size: {args.model_size}")
+
+    if args.model_size == "0.6B":
+        config = PREDICT2_TEXT2IMAGE_PIPELINE_0P6B
+        dit_path = "checkpoints/nvidia/Cosmos-Predict2-0.6B-Text2Image/model.pt"
+    elif args.model_size == "2B":
+        config = PREDICT2_TEXT2IMAGE_PIPELINE_2B
+        dit_path = "checkpoints/nvidia/Cosmos-Predict2-2B-Text2Image/model.pt"
+    elif args.model_size == "14B":
+        config = PREDICT2_TEXT2IMAGE_PIPELINE_14B
+        dit_path = "checkpoints/nvidia/Cosmos-Predict2-14B-Text2Image/model.pt"
+    else:
+        raise ValueError("Invalid model size. Choose either '0.6B', '2B' or '14B'.")
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:
         dit_path = get_cosmos_predict2_text2image_checkpoint(model_size=args.model_size)
     log.info(f"Using dit_path: {dit_path}")
-    # Only set up text encoder path if no encoder is provided
-    text_encoder_path = None if text_encoder is not None else get_t5_model_dir()
-    if text_encoder is not None:
-        log.info("Using provided text encoder")
-    else:
-        log.info(f"Using text encoder from: {text_encoder_path}")
 
     # Disable guardrail if requested
     if args.disable_guardrail:
@@ -176,15 +184,10 @@ def setup_pipeline(args: argparse.Namespace, text_encoder=None) -> Text2ImagePip
         pipe = Text2ImagePipeline.from_config(
             config=config,
             dit_path=dit_path,
-            text_encoder_path=text_encoder_path,
             device="cuda",
             torch_dtype=torch.bfloat16,
             load_ema_to_reg=args.load_ema,
         )
-
-        # Set the provided text encoder if one was passed
-        if text_encoder is not None:
-            pipe.text_encoder = text_encoder
 
         return pipe
 

@@ -87,7 +87,7 @@ _PREDICT2_VIDEO2WORLD_FSDP_2B = dict(
         config=Predict2Video2WorldModelConfig(
             pipe_config=get_cosmos_predict2_video2world_pipeline(model_size="2B"),
             model_manager_config=L(Predict2ModelManagerConfig)(
-                dit_path=get_cosmos_predict2_video2world_checkpoint(model_size="2B"),
+                dit_path="checkpoints/nvidia/Cosmos-Predict2-2B-Video2World/model-720p-16fps.pt",
                 text_encoder_path="",  # Do not load text encoder for training.
             ),
             fsdp_shard_size=8,

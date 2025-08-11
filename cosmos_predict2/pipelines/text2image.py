@@ -24,7 +24,7 @@ from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.fsdp import FSDPModule, fully_shard
 from tqdm import tqdm
 
-from cosmos_predict2.auxiliary.text_encoder import CosmosT5TextEncoder
+from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder, CosmosTextEncoder, get_text_encoder
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_text2image import Text2ImagePipelineConfig
 from cosmos_predict2.datasets.utils import IMAGE_RES_SIZE_INFO
@@ -72,7 +72,7 @@ def get_sample_batch(
 class Text2ImagePipeline(BasePipeline):
     def __init__(self, device: str = "cuda", torch_dtype: torch.dtype = torch.bfloat16):
         super().__init__(device=device, torch_dtype=torch_dtype)
-        self.text_encoder: CosmosT5TextEncoder = None
+        self.text_encoder: CosmosTextEncoder = None
         self.dit: MiniTrainDIT = None
         self.dit_ema: torch.nn.Module = None
         self.tokenizer: TokenizerInterface = None
@@ -87,7 +87,6 @@ class Text2ImagePipeline(BasePipeline):
     def from_config(
         config: LazyDict[Text2ImagePipelineConfig],
         dit_path: str = "",
-        text_encoder_path: str = "",
         device: str = "cuda",
         torch_dtype: torch.dtype = torch.bfloat16,
         load_ema_to_reg: bool = False,
@@ -125,13 +124,7 @@ class Text2ImagePipeline(BasePipeline):
         )
 
         # 4. Load text encoder
-        if text_encoder_path:
-            # inference
-            pipe.text_encoder = CosmosT5TextEncoder(device=device, cache_dir=text_encoder_path)
-            pipe.text_encoder.to(device)
-        else:
-            # training
-            pipe.text_encoder = None
+        pipe.text_encoder = get_text_encoder(config=config.text_encoder, device=device)
 
         # 5. Initialize conditioner
         pipe.conditioner = instantiate(config.conditioner)
