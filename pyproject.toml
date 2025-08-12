@@ -59,19 +59,16 @@ apex = ["apex"]
 # https://github.com/NVIDIA/TransformerEngine/blob/main/pyproject.toml
 # https://github.com/Dao-AILab/flash-attention?tab=readme-ov-file#installation-and-features
 build = [
-  "cmake>=3.21",
-  "flax>=0.7.1",
-  "jax[cuda12]",
+  "cmake",
   "ninja",
   "packaging",
-  "pip>=25.1",
+  "pip",
   "psutil",
   "pybind11[global]",
-  "setuptools>=61.0",
+  "setuptools",
   "wheel",
 ]
 cu126 = [
-  "nvidia-nvtx-cu12==12.6.*",
   "torch==2.6.0",
   "torchvision==0.21.0",
 ]

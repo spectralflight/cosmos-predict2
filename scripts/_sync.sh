@@ -28,9 +28,6 @@ fi
 export PATH="$CUDA_HOME/bin:$PATH"
 
 # Install build dependencies
-uv venv --allow-existing
-uv pip install pip psutil setuptools wheel
-uv pip install "torch==2.7.0" --index-url https://download.pytorch.org/whl/$CUDA_NAME
 extras="--extra $CUDA_NAME"
 uv sync --extra build $extras "$@"
 

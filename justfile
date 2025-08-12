@@ -5,14 +5,14 @@ extras := "flash-attn transformer-engine natten"
 training_extras := "apex"
 
 # Install inference in existing environment
-install cuda='cu126':
-    ./scripts/_sync.sh "{{ cuda }}" "{{ extras }}"
+install cuda *args:
+    ./scripts/_sync.sh "{{ cuda }}" "{{ extras }}" {{ args }}
     echo {{ cuda }} > .venv/cuda-version
     ./.venv/bin/python scripts/test_environment.py
 
 # Install training in existing environment
-install-training:
-    ./scripts/_sync.sh "$(cat .venv/cuda-version)" "{{ extras }} {{ training_extras }}"
+install-training *args:
+    ./scripts/_sync.sh "$(cat .venv/cuda-version)" "{{ extras }} {{ training_extras }}" {{ args }}
     ./.venv/bin/python scripts/test_environment.py --training
 
 # Create a new conda environment
