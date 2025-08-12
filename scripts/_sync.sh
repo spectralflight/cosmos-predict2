@@ -26,6 +26,7 @@ if [ ! -d "$CUDA_HOME" ]; then
     exit 1
 fi
 export PATH="$CUDA_HOME/bin:$PATH"
+export LD_LIBRARY_PATH="$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
 
 # Install build dependencies
 extras="--extra $CUDA_NAME"
@@ -47,9 +48,14 @@ if ! command -v clang &> /dev/null; then
     echo "Error: clang not installed." >&2
     exit 1
 fi
+
 export APEX_BUILD_ARGS="--cpp_ext --cuda_ext"
+
 # transformer-engine: https://github.com/NVIDIA/TransformerEngine?tab=readme-ov-file#pip-installation
 export NVTE_FRAMEWORK=pytorch
+
+# export NATTEN_CUDA_ARCH="8.0;8.6;8.9;9.0;10.0;10.3;12.0"
+# export NATTEN_VERBOSE=1
 
 # Compile dependencies
 for extra in $ALL_EXTRAS; do \

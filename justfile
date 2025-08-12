@@ -1,7 +1,9 @@
 default:
   just --list
 
-extras := "flash-attn transformer-engine natten"
+# HACK
+# extras := "flash-attn transformer-engine natten"
+extras := "natten"
 training_extras := "apex"
 
 # Install inference in existing environment
