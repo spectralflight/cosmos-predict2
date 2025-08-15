@@ -20,8 +20,11 @@ import torch
 from megatron.core import parallel_state
 from torch.distributed.device_mesh import init_device_mesh
 
+from cosmos_predict2.configs.base.config_multiview import (
+    PREDICT2_MULTIVIEW_PIPELINE_2B_720P_10FPS_7VIEWS_29FRAMES,
+    MultiviewPipelineConfig,
+)
 from cosmos_predict2.models.video2world_model import Predict2Video2WorldModel
-from cosmos_predict2.configs.base.config_multiview import PREDICT2_MULTIVIEW_PIPELINE_2B_720P_10FPS_7VIEWS_29FRAMES, MultiviewPipelineConfig
 from cosmos_predict2.pipelines.multiview import MultiviewPipeline
 from imaginaire.utils import log
 
