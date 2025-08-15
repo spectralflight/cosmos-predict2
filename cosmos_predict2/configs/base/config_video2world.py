@@ -38,9 +38,9 @@ from imaginaire.constants import (
     CosmosPredict2Video2WorldFPS,
     CosmosPredict2Video2WorldModelSize,
     CosmosPredict2Video2WorldResolution,
-    get_checkpoints_dir,
+    CHECKPOINTS_DIR,
     get_cosmos_predict2_video2world_tokenizer,
-    get_cosmos_reason1_model_dir,
+    COSMOS_REASON1_MODEL_DIR,
 )
 from imaginaire.lazy_config import LazyCall as L
 from imaginaire.lazy_config import LazyDict
@@ -170,12 +170,12 @@ _PREDICT2_VIDEO2WORLD_PIPELINE_2B = Video2WorldPipelineConfig(
         vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="2B"),
     ),
     prompt_refiner_config=CosmosReason1Config(
-        checkpoint_dir=get_cosmos_reason1_model_dir(),
+        checkpoint_dir=COSMOS_REASON1_MODEL_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
@@ -261,12 +261,12 @@ _PREDICT2_VIDEO2WORLD_PIPELINE_14B = Video2WorldPipelineConfig(
         vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="14B"),
     ),
     prompt_refiner_config=CosmosReason1Config(
-        checkpoint_dir=get_cosmos_reason1_model_dir(),
+        checkpoint_dir=COSMOS_REASON1_MODEL_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
@@ -355,12 +355,12 @@ _PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_2B = Video2WorldPipelineConfig(
         vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="2B"),
     ),
     prompt_refiner_config=CosmosReason1Config(
-        checkpoint_dir=get_cosmos_reason1_model_dir(),
+        checkpoint_dir=COSMOS_REASON1_MODEL_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
@@ -418,12 +418,12 @@ _PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_14B = Video2WorldPipelineConfig(
         vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="14B"),
     ),
     prompt_refiner_config=CosmosReason1Config(
-        checkpoint_dir=get_cosmos_reason1_model_dir(),
+        checkpoint_dir=COSMOS_REASON1_MODEL_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),

@@ -25,7 +25,7 @@ from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoderConfig, CosmosT
 from imaginaire.config import make_freezable
 from imaginaire.constants import (
     CosmosPredict2Video2WorldModelSize,
-    get_checkpoints_dir,
+    CHECKPOINTS_DIR,
     get_cosmos_predict2_text2image_tokenizer,
 )
 from imaginaire.lazy_config import LazyCall as L
@@ -189,7 +189,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_0P6B_FAST_TOKENIZER = Text2ImagePipelineConfig(
         vae_pth=get_cosmos_predict2_text2image_tokenizer(model_size="0.6B"),
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
@@ -269,7 +269,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_2B = Text2ImagePipelineConfig(
         vae_pth=get_cosmos_predict2_text2image_tokenizer(model_size="2B"),
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),
@@ -348,7 +348,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_14B = Text2ImagePipelineConfig(
         vae_pth=get_cosmos_predict2_text2image_tokenizer(model_size="14B"),
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=True,
     ),

@@ -16,36 +16,18 @@
 from typing import Literal
 
 
-def get_checkpoints_dir() -> str:
-    return "checkpoints"
+CHECKPOINTS_DIR = "checkpoints"
 
+T5_MODEL_DIR = f"{CHECKPOINTS_DIR}/google-t5/t5-11b"
 
-def get_t5_model_dir() -> str:
-    return f"{get_checkpoints_dir()}/google-t5/t5-11b"
+LLAMA_GUARD3_MODEL_DIR = f"{CHECKPOINTS_DIR}/meta-llama/Llama-Guard-3-8B"
 
+COSMOS_GUARDRAIL1_MODEL_DIR = f"{CHECKPOINTS_DIR}/nvidia/Cosmos-Guardrail1"
 
-def get_llama_guard3_model_dir() -> str:
-    return f"{get_checkpoints_dir()}/meta-llama/Llama-Guard-3-8B"
-
-
-def get_cosmos_guardrail1_model_dir() -> str:
-    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Guardrail1"
-
-
-def get_cosmos_reason1_model_dir() -> str:
-    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Reason1-7B"
-
-
-def _get_cosmos_reason1_private_model_dir() -> str:
-    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Reason1-Private"
-
-
-def get_cosmos_reason1_private_tokenizer() -> str:
-    return f"{_get_cosmos_reason1_private_model_dir()}/tokenizer"
-
-
-def get_cosmos_reason1_private_checkpoint() -> str:
-    return f"{_get_cosmos_reason1_private_model_dir()}/reason1_internal_real.pt"
+COSMOS_REASON1_MODEL_DIR = f"{CHECKPOINTS_DIR}/nvidia/Cosmos-Reason1-7B"
+_COSMOS_REASON1_PRIVATE_MODEL_DIR = f"{CHECKPOINTS_DIR}/nvidia/Cosmos-Reason1-Private"
+COSMOS_REASON1_PRIVATE_TOKENIZER = f"{_COSMOS_REASON1_PRIVATE_MODEL_DIR}/tokenizer"
+COSMOS_REASON1_PRIVATE_CHECKPOINT = f"{_COSMOS_REASON1_PRIVATE_MODEL_DIR}/reason1_internal_real.pt"
 
 
 CosmosPredict2Text2ImageModelSize = Literal["2B", "14B"]
@@ -55,7 +37,7 @@ CosmosPredict2Text2ImageModelType = Literal["Text2Image"]
 def _get_cosmos_predict2_text2image_model_dir(
     *, model_size: CosmosPredict2Text2ImageModelSize, model_type: CosmosPredict2Text2ImageModelType = "Text2Image"
 ) -> str:
-    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Predict2-{model_size}-{model_type}"
+    return f"{CHECKPOINTS_DIR}/nvidia/Cosmos-Predict2-{model_size}-{model_type}"
 
 
 def get_cosmos_predict2_text2image_tokenizer(
@@ -84,7 +66,7 @@ def _get_cosmos_predict2_video2world_model_dir(
     model_size: CosmosPredict2Video2WorldModelSize,
     model_type: CosmosPredict2Video2WorldModelType = "Video2World",
 ) -> str:
-    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Predict2-{model_size}-{model_type}"
+    return f"{CHECKPOINTS_DIR}/nvidia/Cosmos-Predict2-{model_size}-{model_type}"
 
 
 def get_cosmos_predict2_video2world_tokenizer(

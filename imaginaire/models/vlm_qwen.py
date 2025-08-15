@@ -26,7 +26,7 @@ from torch.nn import functional as F
 from transformers.models.auto.processing_auto import AutoProcessor
 
 from imaginaire.configs.reason1.model_config import FSDP2ModelConfig
-from imaginaire.constants import get_cosmos_reason1_private_tokenizer
+from imaginaire.constants import COSMOS_REASON1_PRIVATE_TOKENIZER
 from imaginaire.networks.qwen2_5_vl import Qwen2_5_VisionTransformerPretrainedModel, Qwen2_5_VLModel
 from imaginaire.utils import log
 from imaginaire.utils.checkpointer import _IncompatibleKeys
@@ -37,7 +37,7 @@ _LOCK_TIMEOUT_SECONDS = 60
 
 class Processor:
     # This is a wrapper around the AutoProcessor class to add some helper functions
-    def __init__(self, name="Qwen/Qwen2.5-VL-3B-Instruct", cache_dir=get_cosmos_reason1_private_tokenizer()):
+    def __init__(self, name="Qwen/Qwen2.5-VL-3B-Instruct", cache_dir=COSMOS_REASON1_PRIVATE_TOKENIZER):
         self.name = name
         self.processor = AutoProcessor.from_pretrained(cache_dir)
         log.info("Successfully loaded processor from local cache")
@@ -898,6 +898,6 @@ def init_mesh(model_config):
 
 def build_tokenizer(
     tokenizer_type: str,
-    cache_dir: str = get_cosmos_reason1_private_tokenizer(),
+    cache_dir: str = COSMOS_REASON1_PRIVATE_TOKENIZER,
 ):
     return Processor(tokenizer_type, cache_dir)

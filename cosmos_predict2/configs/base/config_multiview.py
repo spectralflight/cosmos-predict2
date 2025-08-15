@@ -33,14 +33,14 @@ from cosmos_predict2.models.text2image_dit import SACConfig
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoderConfig, CosmosTextEncoderConfig
 from imaginaire.config import LazyDict, make_freezable
 from imaginaire.constants import (
+    COSMOS_REASON1_MODEL_DIR,
     CosmosPredict2MultiviewFPS,
     CosmosPredict2MultiviewFrames,
     CosmosPredict2MultiviewResolution,
     CosmosPredict2MultiviewViews,
     CosmosPredict2Video2WorldModelSize,
-    get_checkpoints_dir,
+    CHECKPOINTS_DIR,
     get_cosmos_predict2_video2world_tokenizer,
-    get_cosmos_reason1_model_dir,
 )
 from imaginaire.lazy_config import LazyCall as L
 
@@ -177,12 +177,12 @@ _PREDICT2_MULTIVIEW_PIPELINE_2B_10FPS_7VIEWS_29FRAMES = MultiviewPipelineConfig(
         vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="2B"),
     ),
     prompt_refiner_config=CosmosReason1Config(
-        checkpoint_dir=get_cosmos_reason1_model_dir(),
+        checkpoint_dir=COSMOS_REASON1_MODEL_DIR,
         offload_model_to_cpu=True,
         enabled=False,
     ),
     guardrail_config=CosmosGuardrailConfig(
-        checkpoint_dir=get_checkpoints_dir(),
+        checkpoint_dir=CHECKPOINTS_DIR,
         offload_model_to_cpu=True,
         enabled=False,
     ),
