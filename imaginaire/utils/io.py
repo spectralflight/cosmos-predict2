@@ -70,7 +70,7 @@ def save_image_or_video_multiview(
             save_path = f"{base}.mp4"
     log.info(f"Saving video to {save_path} with fps {fps} and result shape {save_obj.shape}")
     easy_io.dump(save_obj, save_path, file_format="mp4", format="mp4", fps=fps, **kwargs)
-    
+
 
 
 def save_image_or_video(

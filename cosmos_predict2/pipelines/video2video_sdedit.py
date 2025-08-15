@@ -76,7 +76,7 @@ def process_video_first_frame(
 
     # Extract only the first frame
     first_frame = video_frames[0]  # (H, W, C)
-    
+
     # Convert numpy array to tensor and normalize to [0, 1] range
     frame_tensor = torch.from_numpy(first_frame).float() / 255.0  # (H, W, C)
     frame_tensor = frame_tensor.permute(2, 0, 1)  # (C, H, W)
@@ -92,17 +92,17 @@ def process_video_first_frame(
 
         # Add batch dimension for resize operation
         frame_tensor = frame_tensor.unsqueeze(0)  # (1, C, H, W)
-        
+
         # Resize and crop the frame
         frame_tensor = F.resize(frame_tensor, resizing_shape)
         frame_tensor = F.center_crop(frame_tensor, resolution)
-        
+
         # Remove batch dimension
         frame_tensor = frame_tensor.squeeze(0)  # (C, H, W)
 
     # Add batch and time dimensions: (C, H, W) -> (1, C, 1, H, W)
     frame_tensor = frame_tensor.unsqueeze(0).unsqueeze(2)  # (1, C, 1, H, W)
-    
+
     return frame_tensor
 
 def read_and_process_video_first_frames(
@@ -317,12 +317,12 @@ class Text2ImageSDEditPipeline(Text2ImagePipeline):
             pipe.data_parallel_size = 1
 
         return pipe
-    
+
     @torch.no_grad()
     def __call__(
         self,
         prompt: str,
-        input_video_path: str, 
+        input_video_path: str,
         edit_strength: float = 0.5,
         negative_prompt: str = "",
         aspect_ratio: str = "16:9",
@@ -578,7 +578,7 @@ class Video2WorldSDEditPipeline(Video2WorldPipeline):
         self,
         input_path: str,
         prompt: str,
-        input_video_path: str, 
+        input_video_path: str,
         edit_strength: float = 0.5,
         negative_prompt: str = "",
         aspect_ratio: str = "16:9",
@@ -664,7 +664,7 @@ class Video2WorldSDEditPipeline(Video2WorldPipeline):
 
         # read input video
         input_video = read_and_process_video_first_frames(input_video_path, [height, width], num_video_frames, resize=True)
-        
+
         # Prepare the data batch with text embeddings
         data_batch = self._get_data_batch_input(
             vid_input, prompt, negative_prompt, num_latent_conditional_frames=num_latent_conditional_frames
@@ -687,7 +687,7 @@ class Video2WorldSDEditPipeline(Video2WorldPipeline):
         x0_fn = self.get_x0_fn_from_batch(
             data_batch, guidance, is_negative_prompt=True, use_cuda_graphs=use_cuda_graphs
         )
-        
+
         log.info("Encoding input video...")
         input_video = input_video.cuda().to(dtype=torch.bfloat16)
         input_video = input_video.to(**self.tensor_kwargs) / 127.5 - 1.0

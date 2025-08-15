@@ -59,7 +59,7 @@ class Predict2MultiviewModelConfig:
     fsdp_shard_size: int = 0  # 0 means not using fsdp, -1 means set to world size
     # High sigma strategy
     high_sigma_ratio: float = 0.0
-    
+
 
 class Predict2MultiviewModel(Predict2Video2WorldModel):
     def __init__(self, config: Predict2MultiviewModelConfig):

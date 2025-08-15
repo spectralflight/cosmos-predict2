@@ -114,7 +114,7 @@ def read_and_process_multiview_video(
         raise ValueError(
             f"Video has only {available_frames_per_view} frames per view but needs at least {frames_to_extract_per_view} frames for num_latent_conditional_frames={num_latent_conditional_frames}"
         )
-        
+
     # Pre-allocate tensor with target dimensions and directly in uint8 format
     # This avoids allocating a large float tensor that would be converted later
     full_video = torch.zeros((num_video_frames, C, H, W), dtype=torch.uint8, device=video_tensor.device)
@@ -293,7 +293,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         return pipe
 
     def _get_data_batch_input(
-        self, video: torch.Tensor, prompt: str, negative_prompt: str = "", num_latent_conditional_frames: int = 1, 
+        self, video: torch.Tensor, prompt: str, negative_prompt: str = "", num_latent_conditional_frames: int = 1,
         n_views: int = 1, fps: int = 30
     ):
         """
@@ -330,7 +330,7 @@ class MultiviewPipeline(Video2WorldPipeline):
             t5_text_embeddings[:, 0:512] = self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
         latent_view_indices_T = torch.repeat_interleave(torch.arange(n_views), self.config.state_t)
         latent_view_indices_B_T = latent_view_indices_T.unsqueeze(0).expand(B, -1).to(self.device)
-        
+
         data_batch = {
             "sample_n_views": n_views,
             "latent_view_indices_B_T": latent_view_indices_B_T,
@@ -416,7 +416,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         dist.all_gather(decoded_state_list, decoded_state, group=cp_group)
         decoded_state = torch.cat(decoded_state_list[0:n_views], dim=2)  # [B, C, V * T, H, W]
         return decoded_state
-    
+
     def _normalize_video_databatch_inplace(self, data_batch: dict[str, torch.Tensor], input_key: str = None) -> None:
         input_key = self.input_video_key if input_key is None else input_key
         if input_key in data_batch:
@@ -583,7 +583,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         num_conditional_frames: int = 1,
         guidance: float = 7.0,
         n_views: int = 1,
-        fps: int = 30, 
+        fps: int = 30,
         num_sampling_step: int = 35,
         seed: int = 0,
         use_cuda_graphs: bool = False,
@@ -732,7 +732,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         # Merge context-parallel chunks back together if needed.
         if self.dit.is_context_parallel_enabled:
             cp_group = self.get_context_parallel_group()
-            cp_size = 1 if cp_group is None else cp_group.size()            
+            cp_size = 1 if cp_group is None else cp_group.size()
             samples = cat_outputs_cp(samples, seq_dim=2, cp_group=cp_group)
             if n_views > 1:
                 samples = rearrange(
@@ -853,7 +853,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         # Merge context-parallel chunks back together if needed.
         if self.dit.is_context_parallel_enabled:
             cp_group = self.get_context_parallel_group()
-            cp_size = 1 if cp_group is None else cp_group.size()            
+            cp_size = 1 if cp_group is None else cp_group.size()
             samples = cat_outputs_cp(samples, seq_dim=2, cp_group=cp_group)
             if n_views > 1:
                 samples = rearrange(

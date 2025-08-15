@@ -340,7 +340,7 @@ class EveryNDrawSampleMultiviewVideo(EveryNDrawSample):
                     to_show.append(sample.float().cpu())
 
         to_show.append(raw_data.float().cpu())
-        
+
         # Transfer2-multiview: visualize control input
         if self.ctrl_hint_keys:
             # visualize input video

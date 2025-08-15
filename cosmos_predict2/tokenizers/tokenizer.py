@@ -768,11 +768,11 @@ class CosmosImageTokenizer(torch.nn.Module, VideoTokenizerInterface):
             squeeze_for_image (bool): Whether to squeeze the image data. Defaults to False.
         """
         super().__init__()
-        
+
         self.dtype = dtype
         self.is_image = is_image
         self.is_casual = False
-        
+
         self.apply_mean_std = apply_mean_std
         self.num_overlap_latent = num_overlap_latent
         self.name = name
@@ -794,7 +794,7 @@ class CosmosImageTokenizer(torch.nn.Module, VideoTokenizerInterface):
         self.decoder.eval()
         mean_std = tokenizer_ckpt["mean_std"]
         self.register_mean_std(mean_std[0], mean_std[1])
-        
+
         log.info(f"Built tokenizer {self.name}")
 
     @property

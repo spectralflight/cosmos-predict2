@@ -169,7 +169,7 @@ predict2_multiview_training_2b_720p_10fps_7views_29frames_waymo5views = dict(
                     rope_w_extrapolation_ratio=3.0,
                     rope_t_extrapolation_ratio=8.0 / 24.0,
                     sac_config=dict(
-                        mode="predict2_2b_720",                    
+                        mode="predict2_2b_720",
                     ),
                 ),
             ),
@@ -206,7 +206,7 @@ predict2_multiview_training_2b_720p_10fps_7views_29frames_waymo5views = dict(
                 sample_n_views=len(camera_keys),
                 dataset_name=None,
             )
-            
+
         ),
         max_iter=100_000,
     ),
@@ -264,7 +264,7 @@ predict2_multiview_lora_training_2b_720p_10fps_7views_29frames_waymo5views = dic
                     rope_w_extrapolation_ratio=3.0,
                     rope_t_extrapolation_ratio=8.0 / 24.0,
                     sac_config=dict(
-                        mode="none",                    
+                        mode="none",
                     ),
                 ),
             ),
@@ -301,7 +301,7 @@ predict2_multiview_lora_training_2b_720p_10fps_7views_29frames_waymo5views = dic
                 sample_n_views=len(camera_keys),
                 dataset_name=None,
             )
-            
+
         ),
         max_iter=100_000,
     ),
@@ -356,7 +356,7 @@ predict2_multiview_training_2b_480p_10fps_7views_29frames_waymo5views = dict(
                     rope_w_extrapolation_ratio=3.0,
                     rope_t_extrapolation_ratio=8.0 / 24.0,
                     sac_config=dict(
-                        mode="none",                    
+                        mode="none",
                     ),
                 ),
             ),
@@ -393,7 +393,7 @@ predict2_multiview_training_2b_480p_10fps_7views_29frames_waymo5views = dict(
                 sample_n_views=len(camera_keys),
                 dataset_name=None,
             )
-            
+
         ),
         max_iter=100_000,
     ),

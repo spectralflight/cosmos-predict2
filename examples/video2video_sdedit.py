@@ -64,7 +64,7 @@ def concatenate_videos_with_title(output_video_path: str,
         in_h,  in_w  =  in_frames.shape[1:3]
         content_h = max(out_h, in_h)
         content_w = out_w + in_w
-        
+
         # Ensure dimensions are even for H.264 compatibility
         if content_h % 2 != 0:
             content_h += 1
@@ -542,7 +542,7 @@ def process_single_video_generation(
             start_time = time.time()
         video, input_video, prompt_used = pipe(
             prompt=prompt,
-            edit_strength=edit_strength,	
+            edit_strength=edit_strength,
 	        input_video_path=input_video_path,
             negative_prompt=negative_prompt,
             aspect_ratio=aspect_ratio,
@@ -588,7 +588,7 @@ def process_single_video_generation(
             title=f'{prompt} (edit strength: img: {image_edit_strength}, vid: {edit_strength})',
             fps=fps
         )
-        
+
         if concatenated_path:
             log.success(f"Successfully created concatenated video: {concatenated_path}")
 

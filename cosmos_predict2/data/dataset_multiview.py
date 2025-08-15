@@ -213,7 +213,7 @@ class MultiviewDataset(Dataset):
                 t5_masks.append(t5_mask)
             video = torch.cat(videos, dim=1)
             t5_embedding = torch.cat(t5_embeddings, dim=0)
-            
+
             data["video"] = video
             data["video_name"] = {
                 "video_path": video_path,

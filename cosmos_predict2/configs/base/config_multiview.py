@@ -61,7 +61,7 @@ class MultiviewPipelineConfig:
         order=7.0,
         is_forward=False,
     )
-    
+
 PREDICT2_MULTIVIEW_NET_2B_10FPS_7VIEWS_29FRAMES = L(MultiViewDiT)(
     max_img_h=240,
     max_img_w=240,
@@ -95,7 +95,7 @@ PREDICT2_MULTIVIEW_NET_2B_10FPS_7VIEWS_29FRAMES = L(MultiViewDiT)(
     n_cameras_emb=7,
     view_condition_dim=7,
     concat_view_embedding=True
-)   
+)
 
 PREDICT2_MULTIVIEW_PIPELINE_2B_10FPS_7VIEWS_29FRAMES = MultiviewPipelineConfig(
     adjust_video_noise=True,
