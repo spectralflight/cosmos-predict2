@@ -30,6 +30,11 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 
 ## Quick Start
 
+```shell
+PROMPT_="A close-up shot captures a vibrant yellow scrubber vigorously working on a grimy plate, its bristles moving in circular motions to lift stubborn grease and food residue. The dish, once covered in remnants of a hearty meal, gradually reveals its original glossy surface. Suds form and bubble around the scrubber, creating a satisfying visual of cleanliness in progress. The sound of scrubbing fills the air, accompanied by the gentle clinking of the dish against the sink. As the scrubber continues its task, the dish transforms, gleaming under the bright kitchen lights, symbolizing the triumph of cleanliness over mess."
+./scripts/inference_text2image.py output/inference_text2image --prompt $PROMPT_
+```
+
 Here is a quick example demonstrating how to use Cosmos-Predict2-2B-Video2World for video generation:
 
 ```python
