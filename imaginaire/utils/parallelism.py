@@ -13,15 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import torch
-from torch.distributed.device_mesh import DeviceMesh
-from torch.distributed.checkpoint.stateful import Stateful
-from torch import nn
-from typing import Any
-from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, set_model_state_dict
-import torch.distributed as dist
 import io
 import pickle
+from typing import Any
+
+import torch
+import torch.distributed as dist
+from torch import nn
+from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, set_model_state_dict
+from torch.distributed.checkpoint.stateful import Stateful
+from torch.distributed.device_mesh import DeviceMesh
 
 try:
     from torch.distributed.tensor import Replicate, distribute_tensor
@@ -155,9 +156,7 @@ def broadcast_to_cp_or_tp_ranks(data_batch: dict[str, torch.Tensor], cp_or_tp_me
 
     image_grid_thw = data_batch.get("image_grid_thw", None)
     if image_grid_thw is not None:
-        data_batch["image_grid_thw"] = broadcast(
-            image_grid_thw, cp_or_tp_mesh
-        )  # NOTE : no need to check shape
+        data_batch["image_grid_thw"] = broadcast(image_grid_thw, cp_or_tp_mesh)  # NOTE : no need to check shape
 
     # TODO : This will NOT work if one batch has video and one batch has image.
     videos = data_batch.get("videos", None)
@@ -166,9 +165,7 @@ def broadcast_to_cp_or_tp_ranks(data_batch: dict[str, torch.Tensor], cp_or_tp_me
 
     video_grid_thw = data_batch.get("video_grid_thw", None)
     if video_grid_thw is not None:
-        data_batch["video_grid_thw"] = broadcast(
-            video_grid_thw, cp_or_tp_mesh
-        )  # NOTE : no need to check shape
+        data_batch["video_grid_thw"] = broadcast(video_grid_thw, cp_or_tp_mesh)  # NOTE : no need to check shape
 
     # broadcast the string to all ranks
     for key in ["__url__", "dialog_str", "__key__"]:

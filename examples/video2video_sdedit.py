@@ -258,6 +258,7 @@ def parse_args() -> argparse.Namespace:
     )
     return parser.parse_args()
 
+
 def setup_video2world_pipeline(args: argparse.Namespace):
     log.info(f"Using model size: {args.model_size}")
     config = get_cosmos_predict2_video2world_pipeline(
@@ -328,16 +329,9 @@ def setup_video2world_pipeline(args: argparse.Namespace):
 
     return pipe
 
+
 def setup_text2image_pipeline(args: argparse.Namespace) -> Text2ImageSDEditPipeline:
-    log.info(f"Using model size: {args.model_size}")
-    if args.model_size == "2B":
-        config = PREDICT2_TEXT2IMAGE_PIPELINE_2B
-        dit_path = "checkpoints/nvidia/Cosmos-Predict2-2B-Text2Image/model.pt"
-    elif args.model_size == "14B":
-        config = PREDICT2_TEXT2IMAGE_PIPELINE_14B
-        dit_path = "checkpoints/nvidia/Cosmos-Predict2-14B-Text2Image/model.pt"
-    else:
-        raise ValueError("Invalid model size. Choose either '2B' or '14B'.")
+    config = get_cosmos_predict2_text2image_pipeline(model_size=args.model_size)
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:

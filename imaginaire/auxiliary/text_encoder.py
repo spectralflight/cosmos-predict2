@@ -1,24 +1,37 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import functools
 from enum import Enum
+from typing import Any, TypeAlias
 
 import attrs
 import torch
 import transformers
-from typing import TypeAlias, Union, List, Optional, Tuple, Dict, Any
-
-import torch.distributed as dist
-import functools
-from torch.distributed.checkpoint.stateful import Stateful
-from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, set_model_state_dict
 from torch import nn
+from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, set_model_state_dict
+from torch.distributed.checkpoint.stateful import Stateful
+from transformers import T5EncoderModel, T5TokenizerFast
 
+from imaginaire.configs.reason1.model_config_qwen import QwenModelConfig, QwenVisionConfig
+from imaginaire.constants import COSMOS_REASON1_CHECKPOINT, T5_MODEL_DIR
 from imaginaire.lazy_config import LazyCall as L
 from imaginaire.lazy_config import instantiate as lazy_instantiate
-from imaginaire.utils import log
-from imaginaire.models.vlm_qwen_omni import QwenVLBaseModel
-from imaginaire.configs.reason1.model_config_qwen import QwenModelConfig, QwenVisionConfig
 from imaginaire.models.vlm_qwen import build_tokenizer
-from imaginaire.constants import COSMOS_REASON1_CHECKPOINT, T5_MODEL_DIR
-from transformers import T5TokenizerFast, T5EncoderModel
+from imaginaire.models.vlm_qwen_omni import QwenVLBaseModel
+from imaginaire.utils import log
 
 transformers.utils.logging.set_verbosity_error()
 
@@ -28,13 +41,13 @@ NUM_EMBEDDING_PADDING_TOKENS = 512
 class ModelWrapper(Stateful):
     """Wrapper for model state dict handling"""
 
-    def __init__(self, model: Union[nn.Module, List[nn.Module]]):
+    def __init__(self, model: nn.Module | list[nn.Module]):
         self.model = [model] if isinstance(model, nn.Module) else model
 
-    def state_dict(self) -> Dict[str, Any]:
+    def state_dict(self) -> dict[str, Any]:
         return {k: v for sd in map(get_model_state_dict, self.model) for k, v in sd.items()}
 
-    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         func = functools.partial(
             set_model_state_dict,
             model_state_dict=state_dict,
@@ -84,12 +97,12 @@ class CosmosReason1TextEncoderConfig:
 
 
 class CosmosReason1TextEncoder:
-    def __init__(self, config: CosmosReason1TextEncoderConfig, device: str = "cuda"):
+    def __init__(self, config: CosmosReason1TextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None):
         self.config = config
 
         log.info("Instantiating text encoder model...")
         with torch.device("meta"):
-            self.model = lazy_instantiate(self.config.model_config)
+            self.model: QwenVLBaseModel = lazy_instantiate(self.config.model_config)
         self.model.to_empty(device=device)
         with torch.no_grad():
             self.model.init_weights()
@@ -142,9 +155,7 @@ class CosmosReason1TextEncoder:
         """
         return (tensor - tensor.mean(dim=-1, keepdim=True)) / (tensor.std(dim=-1, keepdim=True) + 1e-8)
 
-    def compute_text_embeddings_online(
-        self, prompts: List[str]
-    ) -> torch.Tensor:
+    def compute_text_embeddings_online(self, prompts: list[str]) -> torch.Tensor:
         """
         Compute text embeddings for the given prompts.
         """
@@ -232,12 +243,20 @@ class CosmosReason1TextEncoder:
 
         return text_embeddings
 
+    def encode_prompts(
+        self, prompts: str | list[str], max_length: int = 512
+    ) -> torch.Tensor:
+        if isinstance(prompts, str):
+            prompts = [prompts]
+        return self.compute_text_embeddings_online(prompts)
+
 
 @attrs.define(slots=False)
 class CosmosT5TextEncoderConfig:
     """
     Config for the T5 text encoder model
     """
+
     ckpt_path: str = T5_MODEL_DIR
 
 
@@ -248,6 +267,7 @@ class CosmosT5TextEncoder(torch.nn.Module):
         self,
         config: CosmosT5TextEncoderConfig,
         device: str = "cuda",
+        torch_dtype: torch.dtype | None = None,
     ):
         """Initializes the T5 tokenizer and encoder.
 
@@ -258,16 +278,16 @@ class CosmosT5TextEncoder(torch.nn.Module):
         super().__init__()
         self.config = config
         self.device = device
-        self.tokenizer = T5TokenizerFast.from_pretrained(self.config.ckpt_path)
-        self.text_encoder = T5EncoderModel.from_pretrained(self.config.ckpt_path).to(device)
+        self.tokenizer = T5TokenizerFast.from_pretrained(self.config.ckpt_path, torch_dtype=torch_dtype)
+        self.text_encoder = T5EncoderModel.from_pretrained(self.config.ckpt_path, torch_dtype=torch_dtype).to(device)
         self.text_encoder.eval()
 
         log.info("T5 Text encoder model instantiated")
 
     @torch.inference_mode()
     def encode_prompts(
-        self, prompts: Union[str, List[str]], max_length: int = 512, return_mask: bool = False
-    ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+        self, prompts: str | list[str], max_length: int = 512
+    ) -> torch.Tensor:
         """Encodes text prompts into hidden state representations using a T5 encoder.
 
         This function tokenizes the input prompts, processes them through a T5 text encoder,
@@ -278,16 +298,9 @@ class CosmosT5TextEncoder(torch.nn.Module):
             prompts: Input text to encode. Can be a single string or a list of strings.
             max_length: Maximum sequence length for tokenization and padding. Longer
                 sequences will be truncated. Defaults to 512.
-            return_mask: If True, returns the attention mask along with encoded text.
-                Defaults to False.
 
         Returns:
-            If return_mask is False:
-                torch.Tensor: Encoded text embeddings of shape (batch_size, max_length, hidden_size).
-            If return_mask is True:
-                tuple[torch.Tensor, torch.Tensor]: A tuple containing:
-                    - Encoded text embeddings of shape (batch_size, max_length, hidden_size)
-                    - Attention mask of shape (batch_size, max_length) as boolean tensor
+            torch.Tensor: Encoded text embeddings of shape (batch_size, max_length, hidden_size).
 
         Raises:
             ValueError: If the input prompts list is empty.
@@ -324,14 +337,14 @@ class CosmosT5TextEncoder(torch.nn.Module):
         for batch_id in range(encoded_text.shape[0]):
             encoded_text[batch_id][lengths[batch_id] :] = 0
 
-        if return_mask:
-            return encoded_text, attn_mask.bool()
         return encoded_text
 
-CosmosTextEncoderConfig: TypeAlias = Union[CosmosReason1TextEncoderConfig, CosmosT5TextEncoderConfig]
-CosmosTextEncoder: TypeAlias = Union[CosmosReason1TextEncoder, CosmosT5TextEncoder]
 
-def get_text_encoder(config: CosmosTextEncoderConfig, device: str = "cuda") -> Optional[CosmosTextEncoder]:
+CosmosTextEncoderConfig: TypeAlias = CosmosReason1TextEncoderConfig | CosmosT5TextEncoderConfig
+CosmosTextEncoder: TypeAlias = CosmosReason1TextEncoder | CosmosT5TextEncoder
+
+
+def get_text_encoder(config: CosmosTextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None) -> CosmosTextEncoder | None:
     """Create a text encoder from a config.
 
     Args:
@@ -341,12 +354,12 @@ def get_text_encoder(config: CosmosTextEncoderConfig, device: str = "cuda") -> O
     Returns:
         A text encoder instance.
     """
-        
+
     if not config.ckpt_path:
         return None
     if isinstance(config, CosmosReason1TextEncoderConfig):
         return CosmosReason1TextEncoder(config=config, device=device)
     elif isinstance(config, CosmosT5TextEncoderConfig):
-        return CosmosT5TextEncoder(config=config, device=device)
+        return CosmosT5TextEncoder(config=config, device=device, torch_dtype=torch_dtype)
     else:
         raise ValueError(f"Invalid text encoder config type: {type(config)}")

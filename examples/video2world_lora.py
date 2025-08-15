@@ -25,7 +25,9 @@ import torch
 from megatron.core import parallel_state
 from tqdm import tqdm
 
+from imaginaire.auxiliary.text_encoder import get_text_encoder
 from cosmos_predict2.configs.base.config_video2world import (
+    Video2WorldPipelineConfig,
     get_cosmos_predict2_video2world_pipeline,
 )
 from cosmos_predict2.pipelines.video2world import _IMAGE_EXTENSIONS, _VIDEO_EXTENSIONS, Video2WorldPipeline
@@ -74,7 +76,7 @@ def add_lora_to_model(
     return model
 
 
-def setup_lora_pipeline(config, dit_path, args):
+def setup_lora_pipeline(config: Video2WorldPipelineConfig, dit_path: str, args: argparse.Namespace):
     """
     Set up a pipeline with LoRA support.
     This function creates the pipeline, adds LoRA, then loads the checkpoint.
@@ -85,7 +87,6 @@ def setup_lora_pipeline(config, dit_path, args):
     from cosmos_predict2.models.utils import init_weights_on_device, load_state_dict
     from cosmos_predict2.module.denoiser_scaling import RectifiedFlowScaling
     from cosmos_predict2.schedulers.rectified_flow_scheduler import RectifiedFlowAB2Scheduler
-    from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder
     from imaginaire.lazy_config import instantiate
     from imaginaire.utils.ema import FastEmaModelUpdater
 
@@ -118,12 +119,7 @@ def setup_lora_pipeline(config, dit_path, args):
         f"latent_ch {pipe.tokenizer.latent_ch} != state_shape {pipe.config.state_ch}"
     )
     # 4. Load text encoder
-    if config.text_encoder.ckpt_path:
-        # inference
-        pipe.text_encoder = CosmosReason1TextEncoder(device="cuda", device="cuda")
-    else:
-        # training
-        pipe.text_encoder = None
+    pipe.text_encoder = get_text_encoder(config=config.text_encoder, device="cuda")
     # 5. Initialize conditioner
     pipe.conditioner = instantiate(config.conditioner)
     assert sum(p.numel() for p in pipe.conditioner.parameters() if p.requires_grad) == 0, (
@@ -381,21 +377,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def setup_pipeline(args: argparse.Namespace):
-    log.info(f"Using model size: {args.model_size}")
-    if args.model_size == "2B":
-        config = PREDICT2_VIDEO2WORLD_PIPELINE_2B
-        config.resolution = args.resolution
-        if args.fps == 10:  # default is 16 so no need to change config
-            config.state_t = 16
-        dit_path = f"checkpoints/nvidia/Cosmos-Predict2-2B-Video2World/model-{args.resolution}p-{args.fps}fps.pt"
-    elif args.model_size == "14B":
-        config = PREDICT2_VIDEO2WORLD_PIPELINE_14B
-        config.resolution = args.resolution
-        if args.fps == 10:  # default is 16 so no need to change config
-            config.state_t = 16
-        dit_path = f"checkpoints/nvidia/Cosmos-Predict2-14B-Video2World/model-{args.resolution}p-{args.fps}fps.pt"
-    else:
-        raise ValueError("Invalid model size. Choose either '2B' or '14B'.")
+    config = get_cosmos_predict2_video2world_pipeline(
+        model_size=args.model_size, resolution=args.resolution, fps=args.fps
+    )
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     misc.set_random_seed(seed=args.seed, by_rank=True)

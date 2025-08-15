@@ -17,8 +17,6 @@ import argparse
 import json
 import os
 
-from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder
-
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
@@ -101,19 +99,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def setup_pipeline(args: argparse.Namespace) -> Text2ImagePipeline:
-    log.info(f"Using model size: {args.model_size}")
-
-    if args.model_size == "0.6B":
-        config = PREDICT2_TEXT2IMAGE_PIPELINE_0P6B
-        dit_path = "checkpoints/nvidia/Cosmos-Predict2-0.6B-Text2Image/model.pt"
-    elif args.model_size == "2B":
-        config = PREDICT2_TEXT2IMAGE_PIPELINE_2B
-        dit_path = "checkpoints/nvidia/Cosmos-Predict2-2B-Text2Image/model.pt"
-    elif args.model_size == "14B":
-        config = PREDICT2_TEXT2IMAGE_PIPELINE_14B
-        dit_path = "checkpoints/nvidia/Cosmos-Predict2-14B-Text2Image/model.pt"
-    else:
-        raise ValueError("Invalid model size. Choose either '0.6B', '2B' or '14B'.")
+    config = get_cosmos_predict2_text2image_pipeline(model_size=args.model_size, fast_tokenizer=args.use_fast_tokenizer)
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:

@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Optional, Union
-from enum import Enum
 
 import attrs
 
@@ -200,19 +198,19 @@ class VisionEncoderConfig:
     hidden_dim: int = 4096
     n_layers: int = 24
     n_heads: int = 16
-    n_kv_heads: Optional[int] = None
+    n_kv_heads: int | None = None
     norm_type: str = "rmsnorm"
     norm_eps: float = 1e-5
-    image_token_id: Optional[int] = None
-    head_dim: Union[int, None] = None
+    image_token_id: int | None = None
+    head_dim: int | None = None
     use_rope_from_torchtitan: bool = False
     # Only for llama
-    multiple_of: Optional[int] = None
-    ffn_dim_multiplier: Optional[int] = None
+    multiple_of: int | None = None
+    ffn_dim_multiplier: int | None = None
     depth_init: bool = True
-    hidden_act: Optional[str] = None
-    qkv_bias: Optional[bool] = None
-    proj_bias: Optional[bool] = None
+    hidden_act: str | None = None
+    qkv_bias: bool | None = None
+    proj_bias: bool | None = None
     use_cache: bool = (
         False  # This is because VIT also use the Attention class, for shared interface, but it should always be False
     )
@@ -304,13 +302,13 @@ class FSDP2ModelConfig:
     add_tile_tag: bool = False
     add_image_start_end_tag: bool = False
     add_answer_tag: bool = True
-    tile_tag_type: Union[str, None] = "space_separated"
+    tile_tag_type: str | None = "space_separated"
     # Config for kv-cache
     use_cache: bool = False
 
     # Parallelism configurations.
-    cp_size: Union[int, None] = None
-    ep_size: Union[int, None] = None
+    cp_size: int | None = None
+    ep_size: int | None = None
 
     # Config for loss
     loss_per_token: bool = True
@@ -321,5 +319,3 @@ class FSDP2ModelConfig:
 
     def __getitem__(self, item):
         return getattr(self, item)
-
-

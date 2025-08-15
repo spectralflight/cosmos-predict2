@@ -20,6 +20,7 @@ import pickle
 import numpy as np
 
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder
+from imaginaire.constants import get_t5_model_dir
 
 """example command
 python -m scripts.get_t5_embeddings --dataset_path datasets/hdvila

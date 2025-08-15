@@ -14,17 +14,7 @@
 # limitations under the License.
 
 
-from cosmos_predict2.configs.base.config_video2world import Video2WorldPipelineConfig
-from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoderConfig, CosmosT5TextEncoderConfig, CosmosTextEncoderConfig
-from imaginaire.config import make_freezable
-import attrs
-from cosmos_predict2.conditioner import ConditionLocation, ReMapkey, TextAttr, BooleanFlag
-from cosmos_predict2.models.multiview_dit import MultiViewDiT
-from cosmos_predict2.conditioner import MultiViewConditioner
-from imaginaire.config import LazyDict
-from imaginaire.lazy_config import LazyCall as L
-from cosmos_predict2.models.text2image_dit import SACConfig
-from cosmos_predict2.configs.base.config_video2world import CosmosReason1Config, CosmosGuardrailConfig, EMAConfig, SolverTimestampConfig, TokenizerInterface, ConditioningStrategy
+import dataclasses
 from copy import deepcopy
 
 import attrs
@@ -40,6 +30,7 @@ from cosmos_predict2.configs.base.config_video2world import (
 )
 from cosmos_predict2.models.multiview_dit import MultiViewDiT
 from cosmos_predict2.models.text2image_dit import SACConfig
+from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoderConfig, CosmosTextEncoderConfig
 from imaginaire.config import LazyDict, make_freezable
 from imaginaire.constants import (
     CosmosPredict2MultiviewFPS,
@@ -79,7 +70,7 @@ class MultiviewPipelineConfig:
     sigma_data: float = 1.0
     state_ch: int = 16
     state_t: int = 24
-    text_encoder: CosmosTextEncoderConfig = attrs.field(factory=CosmosReason1TextEncoderConfig)
+    text_encoder: CosmosTextEncoderConfig = attrs.field(factory=CosmosT5TextEncoderConfig)
     input_video_key: str = "video"
     input_image_key: str = "images"
     timestamps: SolverTimestampConfig = L(SolverTimestampConfig)(  # noqa: RUF009
@@ -177,6 +168,7 @@ _PREDICT2_MULTIVIEW_PIPELINE_2B_10FPS_7VIEWS_29FRAMES = MultiviewPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=8,
+    text_encoder=CosmosT5TextEncoderConfig(),
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         temporal_window=16,

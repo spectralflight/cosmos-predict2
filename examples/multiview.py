@@ -17,8 +17,13 @@ import argparse
 import json
 import os
 
-from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder
-from imaginaire.constants import CHECKPOINT_DIR, COSMOS_PREDICT2_MULTIVIEW_CHECKPOINT
+from imaginaire.constants import (
+    CosmosPredict2MultiviewFPS,
+    CosmosPredict2MultiviewModelSize,
+    CosmosPredict2MultiviewResolution,
+    get_cosmos_predict2_multiview_checkpoint,
+    get_t5_model_dir,
+)
 
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -61,10 +66,13 @@ def validate_input_file(input_path: str, num_conditional_frames: int) -> bool:
 
     return True
 
+
 def setup_pipeline(args: argparse.Namespace):
-    log.info(f"Using model size: {args.model_size}")
-    config = PREDICT2_MULTIVIEW_PIPELINE_2B_720P_10FPS_7VIEWS_29FRAMES
-    dit_path = "checkpoints/nvidia/Cosmos-Predict2-2B-Multiview/model.pt"
+    views = 7
+    frames = 29
+    config = get_cosmos_predict2_multiview_pipeline(
+        model_size=args.model_size, resolution=args.resolution, fps=args.fps, views=views, frames=frames
+    )
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:

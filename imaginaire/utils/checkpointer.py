@@ -17,15 +17,15 @@ from __future__ import annotations
 
 import os
 import threading
-from typing import TYPE_CHECKING, List, NamedTuple, Tuple
+from typing import TYPE_CHECKING, NamedTuple
 
 import torch
+import torch.distributed as dist
+from torch import nn
 
 from imaginaire.model import ImaginaireModel
 from imaginaire.utils import callback, distributed, log, misc
 from imaginaire.utils.parallelism import ModelWrapper
-import torch.distributed as dist
-from torch import nn
 
 if TYPE_CHECKING:
     from imaginaire.config import CheckpointConfig, JobConfig
@@ -236,17 +236,19 @@ class Checkpointer:
         if self.save_thread:
             self.save_thread.join()
 
+
 class _IncompatibleKeys(
     NamedTuple(
         "IncompatibleKeys",
         [
-            ("missing_keys", List[str]),
-            ("unexpected_keys", List[str]),
-            ("incorrect_shapes", List[Tuple[str, Tuple[int], Tuple[int]]]),
+            ("missing_keys", list[str]),
+            ("unexpected_keys", list[str]),
+            ("incorrect_shapes", list[tuple[str, tuple[int], tuple[int]]]),
         ],
     )
 ):
     pass
+
 
 def load_checkpoint(
     model_parts: list[nn.Module],

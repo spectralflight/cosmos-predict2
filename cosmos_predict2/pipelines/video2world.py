@@ -31,7 +31,6 @@ from torch.distributed.fsdp import FSDPModule, fully_shard
 from tqdm import tqdm
 
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
-from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder, CosmosT5TextEncoder, CosmosTextEncoder, get_text_encoder
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_video2world import ConditioningStrategy, Video2WorldPipelineConfig
 from cosmos_predict2.datasets.utils import VIDEO_RES_SIZE_INFO
@@ -43,6 +42,10 @@ from cosmos_predict2.schedulers.rectified_flow_scheduler import RectifiedFlowAB2
 from cosmos_predict2.tokenizers.tokenizer import TokenizerInterface
 from cosmos_predict2.utils.context_parallel import broadcast, broadcast_split_tensor, cat_outputs_cp, split_inputs_cp
 from cosmos_predict2.utils.dtensor_helper import DTensorFastEmaModelUpdater, broadcast_dtensor_model_states
+from imaginaire.auxiliary.text_encoder import (
+    CosmosTextEncoder,
+    get_text_encoder,
+)
 from imaginaire.lazy_config import instantiate
 from imaginaire.utils import log, misc
 from imaginaire.utils.easy_io import easy_io
@@ -269,6 +272,8 @@ class Video2WorldPipeline(BasePipeline):
     def from_config(
         config: Video2WorldPipelineConfig,
         dit_path: str = "",
+        offload_text_encoder: bool = False,
+        downcast_text_encoder: bool = False,
         device: str = "cuda",
         torch_dtype: torch.dtype = torch.bfloat16,
         load_ema_to_reg: bool = False,
@@ -308,7 +313,11 @@ class Video2WorldPipeline(BasePipeline):
         )
 
         # 4. Load text encoder
-        pipe.text_encoder = get_text_encoder(config=config.text_encoder, device=device)
+        pipe.text_encoder = get_text_encoder(
+            config=config.text_encoder,
+            device="cpu" if offload_text_encoder else device,
+            torch_dtype=pipe.precision if downcast_text_encoder else None,
+        )
 
         # 5. Initialize conditioner
         pipe.conditioner = instantiate(config.conditioner)
@@ -446,18 +455,23 @@ class Video2WorldPipeline(BasePipeline):
     def denoising_model(self) -> torch.nn.Module:
         return self.dit
 
-    def encode_prompt(self, prompts: str | list[str], max_length: int = 512, return_mask: bool = False) -> torch.Tensor:
+    def encode_prompt(self, prompts: str | list[str], max_length: int = 512) -> torch.Tensor:
         offload_to_host = any([p.device.type == "cpu" for p in self.text_encoder.parameters()])
 
         if isinstance(prompts, str):
             prompts = [prompts]
 
-        if isinstance(self.text_encoder, CosmosReason1TextEncoder):
-            return self.text_encoder.compute_text_embeddings_online(prompts)
-        elif isinstance(self.text_encoder, CosmosT5TextEncoder):
-            return self.text_encoder.encode_prompts(prompts, max_length=max_length, return_mask=return_mask)  # type: ignore
-        else:
-            raise ValueError(f"Invalid text encoder type: {type(self.text_encoder)}")
+        if offload_to_host:
+            self.text_encoder.to(device="cuda")
+
+        embeddings = self.text_encoder.encode_prompts(prompts, max_length=max_length)
+
+        if offload_to_host:
+            self.text_encoder.to(device="cpu")
+            gc.collect()
+            torch.cuda.empty_cache()
+
+        return embeddings
 
     @torch.no_grad()
     def decode(self, latent: torch.Tensor) -> torch.Tensor:

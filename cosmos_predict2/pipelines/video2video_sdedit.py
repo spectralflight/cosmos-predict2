@@ -24,7 +24,6 @@ from megatron.core import parallel_state
 from tqdm import tqdm
 
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
-from imaginaire.auxiliary.text_encoder import get_text_encoder
 from cosmos_predict2.conditioner import DataType
 from cosmos_predict2.configs.base.config_text2image import Text2ImagePipelineConfig
 from cosmos_predict2.configs.base.config_video2world import Video2WorldPipelineConfig
@@ -35,6 +34,7 @@ from cosmos_predict2.pipelines.text2image import Text2ImagePipeline, get_sample_
 from cosmos_predict2.pipelines.video2world import Video2WorldPipeline, read_and_process_image, read_and_process_video
 from cosmos_predict2.schedulers.rectified_flow_scheduler import RectifiedFlowAB2Scheduler
 from cosmos_predict2.utils.context_parallel import cat_outputs_cp, split_inputs_cp
+from imaginaire.auxiliary.text_encoder import get_text_encoder
 from imaginaire.lazy_config import LazyDict, instantiate
 from imaginaire.utils import log, misc
 from imaginaire.utils.easy_io import easy_io

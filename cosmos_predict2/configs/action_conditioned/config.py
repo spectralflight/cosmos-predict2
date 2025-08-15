@@ -26,7 +26,14 @@ from cosmos_predict2.configs.base.defaults.ema import EMAConfig
 from cosmos_predict2.models.text2image_dit import SACConfig
 from cosmos_predict2.models.video2world_action_dit import ActionConditionedMinimalV1LVGDiT
 from cosmos_predict2.tokenizers.tokenizer import TokenizerInterface
-from imaginaire.constants import get_cosmos_predict2_tokenizer
+from imaginaire.constants import (
+    CosmosPredict2ActionConditionedFPS,
+    CosmosPredict2ActionConditionedModelSize,
+    CosmosPredict2ActionConditionedResolution,
+    get_checkpoints_dir,
+    get_cosmos_predict2_video2world_tokenizer,
+    get_cosmos_reason1_model_dir,
+)
 from imaginaire.lazy_config import LazyCall as L
 
 # Cosmos Predict2 Video2World 2B
@@ -114,7 +121,7 @@ _PREDICT2_ACTION_CONDITIONED_PIPELINE_2B = Video2WorldPipelineConfig(
         chunk_duration=81,
         load_mean_std=False,
         name="tokenizer",
-        vae_pth=get_cosmos_predict2_tokenizer(model_type="Video2World", model_size="2B"),
+        vae_pth=get_cosmos_predict2_video2world_tokenizer(model_size="2B"),
     ),
     # disable prompt refiner and guardrail for action conditional
     prompt_refiner_config=CosmosReason1Config(

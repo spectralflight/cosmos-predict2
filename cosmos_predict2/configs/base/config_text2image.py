@@ -20,8 +20,8 @@ import attrs
 from cosmos_predict2.conditioner import ReMapkey, TextAttr, TextConditioner
 from cosmos_predict2.configs.base.defaults.ema import EMAConfig
 from cosmos_predict2.models.text2image_dit import MiniTrainDIT
-from cosmos_predict2.tokenizers.tokenizer import TokenizerInterface, CosmosImageTokenizer
-from imaginaire.auxiliary.text_encoder import CosmosTextEncoderConfig, CosmosReason1TextEncoderConfig
+from cosmos_predict2.tokenizers.tokenizer import CosmosImageTokenizer, TokenizerInterface
+from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoderConfig, CosmosTextEncoderConfig
 from imaginaire.config import make_freezable
 from imaginaire.constants import (
     CosmosPredict2Video2WorldModelSize,
@@ -67,7 +67,7 @@ class Text2ImagePipelineConfig:
     sigma_data: float = 1.0
     state_ch: int = 16
     state_t: int = 24
-    text_encoder: CosmosTextEncoderConfig = attrs.field(factory=CosmosReason1TextEncoderConfig)
+    text_encoder: CosmosTextEncoderConfig = attrs.field(factory=CosmosT5TextEncoderConfig)
     input_video_key: str = "video"
     input_image_key: str = "images"
     timestamps: SolverTimestampConfig = attrs.field(factory=SolverTimestampConfig)
@@ -183,6 +183,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_0P6B_FAST_TOKENIZER = Text2ImagePipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
+    text_encoder=CosmosT5TextEncoderConfig(),
     tokenizer=L(CosmosImageTokenizer)(
         name="tokenizer",
         vae_pth=get_cosmos_predict2_text2image_tokenizer(model_size="0.6B"),
@@ -260,6 +261,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_2B = Text2ImagePipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
+    text_encoder=CosmosT5TextEncoderConfig(),
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         load_mean_std=False,
@@ -338,6 +340,7 @@ _PREDICT2_TEXT2IMAGE_PIPELINE_14B = Text2ImagePipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=24,
+    text_encoder=CosmosT5TextEncoderConfig(),
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         load_mean_std=False,

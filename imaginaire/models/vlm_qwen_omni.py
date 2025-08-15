@@ -16,17 +16,17 @@
 """
 This file is modified from imaginaire/models/vlm_qwen.py for omni1 model.
 """
-from typing import List, Optional
 
 import torch
 import torch.distributed as dist
 import torch.nn.functional as F
 from torch.distributed._tensor import DTensor
 
-from imaginaire.utils import log
 from imaginaire.models.vlm_qwen import QwenModel
 from imaginaire.networks.qwen2_5_vl import get_rope_index as get_rope_index_v2_5
+from imaginaire.utils import log
 from imaginaire.utils.parallelism import broadcast_to_cp_or_tp_ranks
+
 
 class QwenVLBaseModel(QwenModel):
     """
@@ -46,22 +46,22 @@ class QwenVLBaseModel(QwenModel):
     def _forward(
         self,
         input_ids: torch.LongTensor = None,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
-        inputs_embeds: Optional[torch.FloatTensor] = None,
-        labels: Optional[torch.LongTensor] = None,
-        use_cache: Optional[bool] = None,
-        output_attentions: Optional[bool] = None,
-        output_hidden_states: Optional[bool] = None,
-        return_dict: Optional[bool] = None,
-        pixel_values: Optional[torch.Tensor] = None,
-        pixel_values_videos: Optional[torch.FloatTensor] = None,
-        image_grid_thw: Optional[torch.LongTensor] = None,
-        video_grid_thw: Optional[torch.LongTensor] = None,
-        rope_deltas: Optional[torch.LongTensor] = None,
-        cache_position: Optional[torch.LongTensor] = None,
-        second_per_grid_ts: Optional[torch.Tensor] = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_values: list[torch.FloatTensor] | None = None,
+        inputs_embeds: torch.FloatTensor | None = None,
+        labels: torch.LongTensor | None = None,
+        use_cache: bool | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        pixel_values: torch.Tensor | None = None,
+        pixel_values_videos: torch.FloatTensor | None = None,
+        image_grid_thw: torch.LongTensor | None = None,
+        video_grid_thw: torch.LongTensor | None = None,
+        rope_deltas: torch.LongTensor | None = None,
+        cache_position: torch.LongTensor | None = None,
+        second_per_grid_ts: torch.Tensor | None = None,
     ) -> torch.Tensor:
         r"""
         Args:

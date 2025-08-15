@@ -24,7 +24,6 @@ from torch.distributed.device_mesh import DeviceMesh
 from torch.distributed.fsdp import FSDPModule, fully_shard
 from tqdm import tqdm
 
-from imaginaire.auxiliary.text_encoder import CosmosReason1TextEncoder, CosmosTextEncoder, get_text_encoder
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_text2image import Text2ImagePipelineConfig
 from cosmos_predict2.datasets.utils import IMAGE_RES_SIZE_INFO
@@ -36,6 +35,7 @@ from cosmos_predict2.pipelines.base import BasePipeline
 from cosmos_predict2.schedulers.rectified_flow_scheduler import RectifiedFlowAB2Scheduler
 from cosmos_predict2.tokenizers.tokenizer import TokenizerInterface
 from cosmos_predict2.utils.dtensor_helper import DTensorFastEmaModelUpdater, broadcast_dtensor_model_states
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoder, get_text_encoder
 from imaginaire.lazy_config import LazyDict, instantiate
 from imaginaire.utils import log, misc
 from imaginaire.utils.ema import FastEmaModelUpdater

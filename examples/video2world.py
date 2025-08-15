@@ -190,48 +190,9 @@ def parse_args() -> argparse.Namespace:
 
 
 def setup_pipeline(args: argparse.Namespace):
-    log.info(f"Using model size: {args.model_size}")
-    if hasattr(args, "natten") and args.natten:
-        assert args.model_size in ["2B", "14B"]
-        config = (
-            PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_2B
-            if args.model_size == "2B"
-            else PREDICT2_VIDEO2WORLD_WITH_NATTEN_PIPELINE_14B
-        )
-
-        config.resolution = args.resolution
-
-        if args.fps == 10:
-            config.state_t = 16
-
-        if args.resolution != "720":
-            raise NotImplementedError("Cosmos-Predict2 + NATTEN only supports 720p inference at the moment.")
-
-        if args.aspect_ratio != "16:9":
-            raise NotImplementedError("Cosmos-Predict2 + NATTEN only supports 16:9 aspect ratio at the moment.")
-
-        dit_path = (
-            f"checkpoints/nvidia/Cosmos-Predict2-{args.model_size}-Video2World/model-720p-{args.fps}fps-natten.pt"
-        )
-
-    elif args.model_size == "2B":
-        config = PREDICT2_VIDEO2WORLD_PIPELINE_2B
-
-        config.resolution = args.resolution
-        if args.fps == 10:  # default is 16 so no need to change config
-            config.state_t = 16
-
-        dit_path = f"checkpoints/nvidia/Cosmos-Predict2-2B-Video2World/model-{args.resolution}p-{args.fps}fps.pt"
-    elif args.model_size == "14B":
-        config = PREDICT2_VIDEO2WORLD_PIPELINE_14B
-
-        config.resolution = args.resolution
-        if args.fps == 10:  # default is 16 so no need to change config
-            config.state_t = 16
-
-        dit_path = f"checkpoints/nvidia/Cosmos-Predict2-14B-Video2World/model-{args.resolution}p-{args.fps}fps.pt"
-    else:
-        raise ValueError("Invalid model size. Choose either '2B' or '14B'.")
+    config = get_cosmos_predict2_video2world_pipeline(
+        model_size=args.model_size, resolution=args.resolution, fps=args.fps, natten=getattr(args, "natten", False)
+    )
     if hasattr(args, "dit_path") and args.dit_path:
         dit_path = args.dit_path
     else:
@@ -288,6 +249,8 @@ def setup_pipeline(args: argparse.Namespace):
     pipe = Video2WorldPipeline.from_config(
         config=config,
         dit_path=dit_path,
+        offload_text_encoder=args.offload_text_encoder,
+        downcast_text_encoder=args.downcast_text_encoder,
         device="cuda",
         torch_dtype=torch.bfloat16,
         load_ema_to_reg=args.load_ema,
