@@ -40,6 +40,9 @@ def main():
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     args = parser.parse_args()
 
+    # TODO: Move to config
+    seed = 42
+
     prompt = args.prompt
     if args.negative_prompt is not None:
         negative_prompt = args.negative_prompt
@@ -50,12 +53,17 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     pipe = diffusers.Cosmos2TextToImagePipeline.from_pretrained(
-        args.model, torch_dtype=torch.bfloat16, revision=args.revision
+        args.model,
+        torch_dtype=torch.bfloat16,
+        revision=args.revision,
     )
     pipe.to("cuda")
 
-    generator = torch.Generator("cuda").manual_seed(42)
-    output = pipe(prompt=prompt, negative_prompt=negative_prompt, generator=generator).images[0]
+    output = pipe(
+        prompt=prompt,
+        negative_prompt=negative_prompt,
+        generator=torch.Generator("cuda").manual_seed(seed),
+    ).images[0]
     output.save(output_dir / "output.png")
 
 
