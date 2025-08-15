@@ -93,8 +93,9 @@ def main():
 
     pipe = diffusers.Cosmos2TextToImagePipeline.from_pretrained(
         args.model,
-        torch_dtype=torch.bfloat16,
         revision=args.revision,
+        use_safetensors=True,
+        torch_dtype=torch.bfloat16,
     )
     pipe.to("cuda")
 
