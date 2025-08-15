@@ -28,7 +28,9 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 * [Cosmos-Predict2-2B-Sample-Action-Conditioned](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned): Video + Action based future visual world generation, post-trained on Bridge dataset
 ---
 
-## Setup
+## Diffusers
+
+Cosmos-Predict2 is included in [`diffusers>=0.34.0`](https://huggingface.co/docs/transformers/en/index).
 
 Install system dependencies:
 
@@ -41,34 +43,25 @@ Install system dependencies:
 
 * [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli)
 
+  Accept the [Llama-Guard-3-8B terms](https://huggingface.co/meta-llama/Llama-Guard-3-8B).
+
   ```shell
   uv tool install -U "huggingface_hub[cli]"
   hf auth login
   ```
 
-Clone the repository:
+Run example inference scripts:
 
-```shell
-git clone https://github.com/nvidia-cosmos/cosmos-predict2.git
-cd cosmos-predict2
-```
-
-## Inference
-
-Cosmos-Predict2 is included in [`diffusers>=0.34.0`](https://huggingface.co/docs/transformers/en/index).
-
-We provide example inference scripts:
-
-* [Text2Image](scripts/inference_text2image.py)
+* [Text2Image](scripts/hf_text2image.py)
 
   ```shell
-  ./scripts/inference_text2image.py output/inference_text2image --prompt "assets/text2image/example_prompt.txt"
+  ./scripts/hf_text2image.py output/hf_text2image --prompt "assets/text2image/example_prompt.txt" -v
   ```
 
-* [Video2World](scripts/inference_video2world.py)
+* [Video2World](scripts/hf_video2world.py)
 
   ```shell
-  ./scripts/inference_video2world.py output/inference_video2world --prompt "assets/video2world/example_prompt.txt" --video "assets/video2world/example_input.jpg"
+  ./scripts/hf_video2world.py output/hf_video2world --prompt "assets/video2world/example_prompt.txt" --image "assets/video2world/example_input.jpg" -v
   ```
 
 ## Quick Start

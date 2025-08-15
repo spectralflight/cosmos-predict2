@@ -7,7 +7,6 @@
 #   "cosmos-guardrail",
 #   "diffusers>=0.34.0",
 #   "rich",
-#   "pyyaml",
 #   "transformers",
 # ]
 # [tool.uv]
@@ -15,17 +14,21 @@
 # override-dependencies = ["peft>=0.15.0"]
 # ///
 
+
+"""Example of Cosmos-Predict2 Text2Image inference using Hugging Face diffusers."""
+
+import textwrap
 import torch
 import diffusers
 import argparse
 from rich import print
 import pathlib
-import yaml
 
 ROOT = pathlib.Path(__file__).parents[1]
+SEPARATOR = "-" * 20
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", type=str, help="Output directory")
     parser.add_argument("--prompt", type=str, required=True, help="Path to prompt text file")
     parser.add_argument("--negative_prompt", type=str, help="Path to negative prompt text file")
@@ -37,19 +40,29 @@ def main():
     )
     parser.add_argument("--revision", type=str, help="Model revision (branch name, tag name, or commit id)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
+    parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
+    parser.add_argument("--steps", type=int, default=35, help="The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.")
+    parser.add_argument("--guidance", type=float, default=7, help="Guidance scale as defined in [Classifier-Free Diffusion Guidance](https://huggingface.co/papers/2207.12598). `guidance_scale` is defined as `w` of equation 2. of [Imagen Paper](https://huggingface.co/papers/2205.11487). Guidance scale is enabled by setting `guidance_scale > 1`.")
+    parser.add_argument("--height", type=int, default=768, help="The height in pixels of the generated image.")
+    parser.add_argument("--width", type=int, default=1360, help="The width in pixels of the generated image.")
     args = parser.parse_args()
-
-    # TODO: Move to config
-    seed = 42
 
     prompt = open(args.prompt).read()
     if args.negative_prompt is not None:
         negative_prompt = open(args.negative_prompt).read()
     else:
-        negative_prompt = open(f"{ROOT}/prompts/default_negative_prompt.txt").read()
+        negative_prompt = open(f"{ROOT}/prompts/video2world/negative/default.txt").read()
 
     output_dir = pathlib.Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.verbose:
+        print(SEPARATOR)
+        print(f"Prompt:")
+        print(textwrap.indent(prompt.rstrip(), "  "))
+        print(f"Negative Prompt:")
+        print(textwrap.indent(negative_prompt.rstrip(), "  "))
+        print(SEPARATOR)
 
     pipe = diffusers.Cosmos2TextToImagePipeline.from_pretrained(
         args.model,
@@ -61,7 +74,11 @@ def main():
     output = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
-        generator=torch.Generator("cuda").manual_seed(seed),
+        generator=torch.Generator("cuda").manual_seed(args.seed),
+        num_inference_steps=args.steps,
+        guidance_scale=args.guidance,
+        height=args.height,
+        width=args.width,
     ).images[0]
     output.save(output_dir / "output.png")
     print(f"Saved image to: {output_dir / 'output.png'}")
