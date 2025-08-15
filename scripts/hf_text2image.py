@@ -21,7 +21,6 @@
 #   "accelerate",
 #   "cosmos-guardrail",
 #   "diffusers>=0.34.0",
-#   "rich",
 #   "transformers",
 # ]
 # [tool.uv]
@@ -38,7 +37,6 @@ import textwrap
 
 import diffusers
 import torch
-from rich import print
 
 ROOT = pathlib.Path(__file__).parents[1]
 SEPARATOR = "-" * 20
@@ -99,6 +97,7 @@ def main():
     )
     pipe.to("cuda")
 
+    print("Generating image...")
     output = pipe(
         prompt=prompt,
         negative_prompt=negative_prompt,
