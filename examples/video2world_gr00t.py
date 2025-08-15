@@ -28,7 +28,6 @@ from imaginaire.constants import (
     CosmosPredict2Gr00tModelSize,
     CosmosPredict2Video2WorldAspectRatio,
     get_cosmos_predict2_gr00t_checkpoint,
-    get_t5_model_dir,
 )
 
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing
@@ -146,7 +145,6 @@ def setup_pipeline(args: argparse.Namespace):
             fps=fps,
             aspect_ratio=args.aspect_ratio,
         )
-    text_encoder_path = get_t5_model_dir()
     log.info(f"Loading model from: {dit_path}")
 
     misc.set_random_seed(seed=args.seed, by_rank=True)

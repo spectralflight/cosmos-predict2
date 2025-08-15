@@ -26,6 +26,7 @@ from cosmos_predict2.configs.base.defaults.ema import EMAConfig
 from cosmos_predict2.models.text2image_dit import SACConfig
 from cosmos_predict2.models.video2world_action_dit import ActionConditionedMinimalV1LVGDiT
 from cosmos_predict2.tokenizers.tokenizer import TokenizerInterface
+from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoderConfig
 from imaginaire.constants import (
     CosmosPredict2ActionConditionedFPS,
     CosmosPredict2ActionConditionedModelSize,
@@ -116,7 +117,7 @@ _PREDICT2_ACTION_CONDITIONED_PIPELINE_2B = Video2WorldPipelineConfig(
     sigma_data=1.0,
     state_ch=16,
     state_t=4,
-    text_encoder_class="T5",
+    text_encoder=CosmosT5TextEncoderConfig(),
     tokenizer=L(TokenizerInterface)(
         chunk_duration=81,
         load_mean_std=False,

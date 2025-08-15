@@ -126,9 +126,6 @@ def setup_pipeline(args: argparse.Namespace):
             model_size=args.model_size, resolution=resolution, fps=fps
         )
 
-    # text_encoder_path = get_t5_model_dir()
-    text_encoder_path = ""
-
     misc.set_random_seed(seed=args.seed, by_rank=True)
     # Initialize cuDNN.
     torch.backends.cudnn.deterministic = False

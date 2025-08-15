@@ -34,7 +34,6 @@ from imaginaire.constants import (
     CosmosPredict2Video2WorldAspectRatio,
     CosmosPredict2Video2WorldModelSize,
     get_cosmos_predict2_video2world_checkpoint,
-    get_t5_model_dir,
 )
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.io import save_image_or_video, save_text_prompts
@@ -166,7 +165,6 @@ def setup_pipeline(args: argparse.Namespace):
         dit_path = get_cosmos_predict2_video2world_checkpoint(
             model_size=args.model_size, resolution=resolution, fps=fps, aspect_ratio=args.aspect_ratio
         )
-    text_encoder_path = get_t5_model_dir()
 
     misc.set_random_seed(seed=args.seed, by_rank=True)
     # Initialize cuDNN.

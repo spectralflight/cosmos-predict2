@@ -36,6 +36,18 @@ def get_cosmos_reason1_model_dir() -> str:
     return f"{get_checkpoints_dir()}/nvidia/Cosmos-Reason1-7B"
 
 
+def _get_cosmos_reason1_private_model_dir() -> str:
+    return f"{get_checkpoints_dir()}/nvidia/Cosmos-Reason1-Private"
+
+
+def get_cosmos_reason1_private_tokenizer() -> str:
+    return f"{_get_cosmos_reason1_private_model_dir()}/tokenizer"
+
+
+def get_cosmos_reason1_private_checkpoint() -> str:
+    return f"{_get_cosmos_reason1_private_model_dir()}/reason1_internal_real.pt"
+
+
 CosmosPredict2Text2ImageModelSize = Literal["2B", "14B"]
 CosmosPredict2Text2ImageModelType = Literal["Text2Image"]
 

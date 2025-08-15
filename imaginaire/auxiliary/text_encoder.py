@@ -26,7 +26,7 @@ from torch.distributed.checkpoint.stateful import Stateful
 from transformers import T5EncoderModel, T5TokenizerFast
 
 from imaginaire.configs.reason1.model_config_qwen import QwenModelConfig, QwenVisionConfig
-from imaginaire.constants import COSMOS_REASON1_CHECKPOINT, T5_MODEL_DIR
+from imaginaire.constants import get_t5_model_dir, get_cosmos_reason1_private_checkpoint
 from imaginaire.lazy_config import LazyCall as L
 from imaginaire.lazy_config import instantiate as lazy_instantiate
 from imaginaire.models.vlm_qwen import build_tokenizer
@@ -74,7 +74,7 @@ class CosmosReason1TextEncoderConfig:
     compute_online: bool = True
     embedding_concat_strategy: str = str(EmbeddingConcatStrategy.FULL_CONCAT)
     n_layers_per_group: int = 5
-    ckpt_path: str = COSMOS_REASON1_CHECKPOINT
+    ckpt_path: str = get_cosmos_reason1_private_checkpoint()
     model_config: QwenVLBaseModel = L(QwenVLBaseModel)(  # noqa: RUF009
         model_config=L(QwenModelConfig)(
             tokenizer_type="Qwen/Qwen2.5-VL-7B-Instruct",
@@ -257,7 +257,7 @@ class CosmosT5TextEncoderConfig:
     Config for the T5 text encoder model
     """
 
-    ckpt_path: str = T5_MODEL_DIR
+    ckpt_path: str = get_t5_model_dir()
 
 
 class CosmosT5TextEncoder(torch.nn.Module):
