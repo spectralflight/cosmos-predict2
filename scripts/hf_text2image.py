@@ -1,4 +1,19 @@
 #!/usr/bin/env -S uv run --script
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # https://docs.astral.sh/uv/guides/scripts/#using-a-shebang-to-create-an-executable-file
 # /// script
 # requires-python = ">=3.10"
@@ -17,15 +32,17 @@
 
 """Example of Cosmos-Predict2 Text2Image inference using Hugging Face diffusers."""
 
-import textwrap
-import torch
-import diffusers
 import argparse
-from rich import print
 import pathlib
+import textwrap
+
+import diffusers
+import torch
+from rich import print
 
 ROOT = pathlib.Path(__file__).parents[1]
 SEPARATOR = "-" * 20
+
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -41,8 +58,18 @@ def main():
     parser.add_argument("--revision", type=str, help="Model revision (branch name, tag name, or commit id)")
     parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
     parser.add_argument("--seed", type=int, default=42, help="Random seed for reproducibility")
-    parser.add_argument("--steps", type=int, default=35, help="The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.")
-    parser.add_argument("--guidance", type=float, default=7, help="Guidance scale as defined in [Classifier-Free Diffusion Guidance](https://huggingface.co/papers/2207.12598). `guidance_scale` is defined as `w` of equation 2. of [Imagen Paper](https://huggingface.co/papers/2205.11487). Guidance scale is enabled by setting `guidance_scale > 1`.")
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=35,
+        help="The number of denoising steps. More denoising steps usually lead to a higher quality image at the expense of slower inference.",
+    )
+    parser.add_argument(
+        "--guidance",
+        type=float,
+        default=7,
+        help="Guidance scale as defined in [Classifier-Free Diffusion Guidance](https://huggingface.co/papers/2207.12598). `guidance_scale` is defined as `w` of equation 2. of [Imagen Paper](https://huggingface.co/papers/2205.11487). Guidance scale is enabled by setting `guidance_scale > 1`.",
+    )
     parser.add_argument("--height", type=int, default=768, help="The height in pixels of the generated image.")
     parser.add_argument("--width", type=int, default=1360, help="The width in pixels of the generated image.")
     args = parser.parse_args()
@@ -58,9 +85,9 @@ def main():
 
     if args.verbose:
         print(SEPARATOR)
-        print(f"Prompt:")
+        print("Prompt:")
         print(textwrap.indent(prompt.rstrip(), "  "))
-        print(f"Negative Prompt:")
+        print("Negative Prompt:")
         print(textwrap.indent(negative_prompt.rstrip(), "  "))
         print(SEPARATOR)
 
