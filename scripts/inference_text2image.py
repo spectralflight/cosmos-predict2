@@ -24,12 +24,11 @@ import yaml
 
 ROOT = pathlib.Path(__file__).parents[1]
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("output", type=str, help="Output directory")
-    parser.add_argument("--prompt", type=str, required=True, help="Prompt")
-    parser.add_argument("--negative_prompt", type=str, help="Negative prompt")
+    parser.add_argument("--prompt", type=str, required=True, help="Path to prompt text file")
+    parser.add_argument("--negative_prompt", type=str, help="Path to negative prompt text file")
     parser.add_argument(
         "--model",
         type=str,
@@ -43,11 +42,11 @@ def main():
     # TODO: Move to config
     seed = 42
 
-    prompt = args.prompt
+    prompt = open(args.prompt).read()
     if args.negative_prompt is not None:
-        negative_prompt = args.negative_prompt
+        negative_prompt = open(args.negative_prompt).read()
     else:
-        negative_prompt = yaml.safe_load(open(f"{ROOT}/prompts/default.yaml", "rb"))["negative_prompt"]
+        negative_prompt = open(f"{ROOT}/prompts/default_negative_prompt.txt").read()
 
     output_dir = pathlib.Path(args.output)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -65,6 +64,7 @@ def main():
         generator=torch.Generator("cuda").manual_seed(seed),
     ).images[0]
     output.save(output_dir / "output.png")
+    print(f"Saved image to: {output_dir / 'output.png'}")
 
 
 if __name__ == "__main__":

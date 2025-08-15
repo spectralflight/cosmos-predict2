@@ -28,17 +28,50 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 * [Cosmos-Predict2-2B-Sample-Action-Conditioned](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned): Video + Action based future visual world generation, post-trained on Bridge dataset
 ---
 
+## Setup
+
+Install system dependencies:
+
+* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+
+  ```shell
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  source $HOME/.local/bin/env
+  ```
+
+* [Hugging Face CLI](https://huggingface.co/docs/huggingface_hub/en/guides/cli)
+
+  ```shell
+  uv tool install -U "huggingface_hub[cli]"
+  hf auth login
+  ```
+
+Clone the repository:
+
+```shell
+git clone https://github.com/nvidia-cosmos/cosmos-predict2.git
+cd cosmos-predict2
+```
+
+## Inference
+
+Cosmos-Predict2 is included in [`diffusers>=0.34.0`](https://huggingface.co/docs/transformers/en/index).
+
+We provide example inference scripts:
+
+* [Text2Image](scripts/inference_text2image.py)
+
+  ```shell
+  ./scripts/inference_text2image.py output/inference_text2image --prompt "assets/text2image/example_prompt.txt"
+  ```
+
+* [Video2World](scripts/inference_video2world.py)
+
+  ```shell
+  ./scripts/inference_video2world.py output/inference_video2world --prompt "assets/video2world/example_prompt.txt" --video "assets/video2world/example_input.jpg"
+  ```
+
 ## Quick Start
-
-```shell
-PROMPT_="A close-up shot captures a vibrant yellow scrubber vigorously working on a grimy plate, its bristles moving in circular motions to lift stubborn grease and food residue. The dish, once covered in remnants of a hearty meal, gradually reveals its original glossy surface. Suds form and bubble around the scrubber, creating a satisfying visual of cleanliness in progress. The sound of scrubbing fills the air, accompanied by the gentle clinking of the dish against the sink. As the scrubber continues its task, the dish transforms, gleaming under the bright kitchen lights, symbolizing the triumph of cleanliness over mess."
-./scripts/inference_text2image.py output/inference_text2image --prompt $PROMPT_
-```
-
-```shell
-PROMPT_="A high-definition video captures the precision of robotic welding in an industrial setting. The first frame showcases a robotic arm, equipped with a welding torch, positioned over a large metal structure. The welding process is in full swing, with bright sparks and intense light illuminating the scene, creating a vivid display of blue and white hues. A significant amount of smoke billows around the welding area, partially obscuring the view but emphasizing the heat and activity. The background reveals parts of the workshop environment, including a ventilation system and various pieces of machinery, indicating a busy and functional industrial workspace. As the video progresses, the robotic arm maintains its steady position, continuing the welding process and moving to its left. The welding torch consistently emits sparks and light, and the smoke continues to rise, diffusing slightly as it moves upward. The metal surface beneath the torch shows ongoing signs of heating and melting. The scene retains its industrial ambiance, with the welding sparks and smoke dominating the visual field, underscoring the ongoing nature of the welding operation."
-./scripts/inference_video2world.py output/inference_video2world --prompt $PROMPT_ --video "assets/video2world/example_input.jpg"
-```
 
 Here is a quick example demonstrating how to use Cosmos-Predict2-2B-Video2World for video generation:
 
