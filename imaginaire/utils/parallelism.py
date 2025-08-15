@@ -42,7 +42,7 @@ def broadcast_object(
     obj: Any,
     src_rank: int,
     group: object = dist.group.WORLD,
-    device: torch.device = torch.device("cpu"),
+    device: torch.device = torch.device("cpu"),  # noqa: B008
 ) -> Any:
     r"""
     Broadcasts an object to the given group.
@@ -136,7 +136,7 @@ def broadcast_to_cp_or_tp_ranks(data_batch: dict[str, torch.Tensor], cp_or_tp_me
         padding_mask = data_batch["padding_mask"]
         data_batch["padding_mask"] = broadcast_with_shape_check(padding_mask, cp_or_tp_mesh)
 
-    # Some rank may not have images, e.g. text data, remove images from all ranks in the group if first rank in the group doesn’t have it, otherwise, create it
+    # Some rank may not have images, e.g. text data, remove images from all ranks in the group if first rank in the group doesn't have it, otherwise, create it
     has_images = (
         torch.ones(1, dtype=torch.bool).to(device=tokens.device)
         if "images" in data_batch

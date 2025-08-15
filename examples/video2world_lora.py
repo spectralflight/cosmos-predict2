@@ -25,18 +25,16 @@ import torch
 from megatron.core import parallel_state
 from tqdm import tqdm
 
-from imaginaire.auxiliary.text_encoder import get_text_encoder
 from cosmos_predict2.configs.base.config_video2world import (
     Video2WorldPipelineConfig,
     get_cosmos_predict2_video2world_pipeline,
 )
 from cosmos_predict2.pipelines.video2world import _IMAGE_EXTENSIONS, _VIDEO_EXTENSIONS, Video2WorldPipeline
+from imaginaire.auxiliary.text_encoder import get_text_encoder
 from imaginaire.constants import (
     CosmosPredict2Video2WorldFPS,
     CosmosPredict2Video2WorldModelSize,
     CosmosPredict2Video2WorldResolution,
-    get_cosmos_predict2_video2world_checkpoint,
-    get_t5_model_dir,
 )
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.io import save_image_or_video

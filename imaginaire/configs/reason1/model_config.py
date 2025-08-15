@@ -268,7 +268,7 @@ class FSDP2ModelConfig:
 
     vision_encoder: str = "openai/clip-vit-base-patch32"
     vision_encoder_in_channels: int = 3
-    vision_encoder_config: VisionEncoderConfig = VisionEncoderConfig()
+    vision_encoder_config: VisionEncoderConfig = VisionEncoderConfig()  # noqa: RUF009
     mm_projector: str = None
 
     ckpt_dir: str = None
@@ -288,13 +288,13 @@ class FSDP2ModelConfig:
     # Reference: https://github.com/pytorch/torchtitan/issues/335
 
     # training for fsdp2
-    training: TrainingConfig = TrainingConfig()
-    experimental: ExperimentalConfig = ExperimentalConfig()
-    activation_checkpoint: ActivationCheckpointConfig = ActivationCheckpointConfig()
-    float8: Float8Config = Float8Config()
-    checkpoint: CheckpointConfig = CheckpointConfig()
-    optimizer: OptimizerConfig = OptimizerConfig()
-    comm: CommConfig = CommConfig()
+    training: TrainingConfig = TrainingConfig()  # noqa: RUF009
+    experimental: ExperimentalConfig = ExperimentalConfig()  # noqa: RUF009
+    activation_checkpoint: ActivationCheckpointConfig = ActivationCheckpointConfig()  # noqa: RUF009
+    float8: Float8Config = Float8Config()  # noqa: RUF009
+    checkpoint: CheckpointConfig = CheckpointConfig()  # noqa: RUF009
+    optimizer: OptimizerConfig = OptimizerConfig()  # noqa: RUF009
+    comm: CommConfig = CommConfig()  # noqa: RUF009
     seed: int = 0
     deterministic: bool = False
     # Image data processing and prompt formatting

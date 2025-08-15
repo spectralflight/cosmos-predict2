@@ -253,7 +253,7 @@ class _IncompatibleKeys(
 def load_checkpoint(
     model_parts: list[nn.Module],
     ckpt_dir,
-    model_ckpt_key_map: dict[str, str] = {},
+    model_ckpt_key_map: dict[str, str] = {},  # noqa: B006
 ):
     log.info(f"Loading checkpoint from {ckpt_dir}.")
 

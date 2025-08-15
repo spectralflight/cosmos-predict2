@@ -33,7 +33,6 @@ from imaginaire.constants import (
     CosmosPredict2Text2ImageModelSize,
     CosmosPredict2Video2WorldAspectRatio,
     get_cosmos_predict2_text2image_checkpoint,
-    get_t5_model_dir,
 )
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.io import save_image_or_video, save_text_prompts

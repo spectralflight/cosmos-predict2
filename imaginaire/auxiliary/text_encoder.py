@@ -75,7 +75,7 @@ class CosmosReason1TextEncoderConfig:
     embedding_concat_strategy: str = str(EmbeddingConcatStrategy.FULL_CONCAT)
     n_layers_per_group: int = 5
     ckpt_path: str = COSMOS_REASON1_CHECKPOINT
-    model_config: QwenVLBaseModel = L(QwenVLBaseModel)(
+    model_config: QwenVLBaseModel = L(QwenVLBaseModel)(  # noqa: RUF009
         model_config=L(QwenModelConfig)(
             tokenizer_type="Qwen/Qwen2.5-VL-7B-Instruct",
             name_or_path="Qwen/Qwen2.5-VL-7B-Instruct",
@@ -97,7 +97,9 @@ class CosmosReason1TextEncoderConfig:
 
 
 class CosmosReason1TextEncoder:
-    def __init__(self, config: CosmosReason1TextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None):
+    def __init__(
+        self, config: CosmosReason1TextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None
+    ):
         self.config = config
 
         log.info("Instantiating text encoder model...")
@@ -115,7 +117,7 @@ class CosmosReason1TextEncoder:
     def load_checkpoint(
         model_parts: list[nn.Module],
         ckpt_path: str,
-        model_ckpt_key_map: dict[str, str] = {},
+        model_ckpt_key_map: dict[str, str] = {},  # noqa: B006
     ):
         log.info(f"Loading checkpoint from {ckpt_path}.")
 
@@ -243,9 +245,7 @@ class CosmosReason1TextEncoder:
 
         return text_embeddings
 
-    def encode_prompts(
-        self, prompts: str | list[str], max_length: int = 512
-    ) -> torch.Tensor:
+    def encode_prompts(self, prompts: str | list[str], max_length: int = 512) -> torch.Tensor:
         if isinstance(prompts, str):
             prompts = [prompts]
         return self.compute_text_embeddings_online(prompts)
@@ -285,9 +285,7 @@ class CosmosT5TextEncoder(torch.nn.Module):
         log.info("T5 Text encoder model instantiated")
 
     @torch.inference_mode()
-    def encode_prompts(
-        self, prompts: str | list[str], max_length: int = 512
-    ) -> torch.Tensor:
+    def encode_prompts(self, prompts: str | list[str], max_length: int = 512) -> torch.Tensor:
         """Encodes text prompts into hidden state representations using a T5 encoder.
 
         This function tokenizes the input prompts, processes them through a T5 text encoder,
@@ -344,7 +342,9 @@ CosmosTextEncoderConfig: TypeAlias = CosmosReason1TextEncoderConfig | CosmosT5Te
 CosmosTextEncoder: TypeAlias = CosmosReason1TextEncoder | CosmosT5TextEncoder
 
 
-def get_text_encoder(config: CosmosTextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None) -> CosmosTextEncoder | None:
+def get_text_encoder(
+    config: CosmosTextEncoderConfig, device: str = "cuda", torch_dtype: torch.dtype | None = None
+) -> CosmosTextEncoder | None:
     """Create a text encoder from a config.
 
     Args:

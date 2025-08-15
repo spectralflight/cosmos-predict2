@@ -212,7 +212,7 @@ class QwenVLBaseModel(QwenModel):
         hidden_states = outputs[0]
         logits = self.lm_head(hidden_states)
         if self.cp_mesh is not None:
-            logits = DTensor.from_local(logits, device_mesh=self.cp_mesh, placements=[Shard(1)]).full_tensor()
+            logits = DTensor.from_local(logits, device_mesh=self.cp_mesh, placements=[Shard(1)]).full_tensor()  # noqa: F821
         return logits, outputs
 
     """
@@ -220,7 +220,7 @@ class QwenVLBaseModel(QwenModel):
     MODIFICATIONS: adding the hidden states to the output.
     """
 
-    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:
+    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:  # noqa: B006
         """
         The training step of the model, including the loss computation.
         """
@@ -380,7 +380,7 @@ class QwenVLBaseModel(QwenModel):
             total_loss = ce_loss
 
         output_batch["ce_loss"] = ce_loss
-        if self.config.aux_loss_coeff > 0 and aux_loss is not None:
-            total_loss += aux_loss * self.config.aux_loss_coeff
+        if self.config.aux_loss_coeff > 0 and aux_loss is not None:  # noqa: F821
+            total_loss += aux_loss * self.config.aux_loss_coeff  # noqa: F821
 
         return output_batch, total_loss

@@ -22,7 +22,6 @@ from imaginaire.constants import (
     CosmosPredict2MultiviewModelSize,
     CosmosPredict2MultiviewResolution,
     get_cosmos_predict2_multiview_checkpoint,
-    get_t5_model_dir,
 )
 
 # Set TOKENIZERS_PARALLELISM environment variable to avoid deadlocks with multiprocessing

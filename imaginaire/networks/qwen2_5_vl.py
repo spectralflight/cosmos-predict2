@@ -125,7 +125,7 @@ def generate(
     generated_tokens = input_ids.clone()
 
     num_input_ids = inputs["input_ids"].shape[1]
-    for i in range(max_new_tokens):
+    for i in range(max_new_tokens):  # noqa: B007
         # Update attention mask
         inputs["attention_mask"] = torch.ones_like(inputs["input_ids"])
         next_token = generate_next_token(
@@ -367,7 +367,7 @@ class Qwen2_5_VLVisionBlock(nn.Module):
 
 class Qwen2_5_VisionTransformerPretrainedModel(nn.Module):
     config_class = Qwen2_5_VLVisionConfig
-    _no_split_modules = ["Qwen2_5_VLVisionBlock"]
+    _no_split_modules = ["Qwen2_5_VLVisionBlock"]  # noqa: RUF012
 
     def __init__(self, config) -> None:
         super().__init__()
@@ -1488,9 +1488,9 @@ class Qwen2_5_VLCausalLMOutputWithPast(ModelOutput):
 
 
 class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
-    _tied_weights_keys = ["lm_head.weight"]
+    _tied_weights_keys = ["lm_head.weight"]  # noqa: RUF012
     config_class = Qwen2_5_VLConfig
-    _no_split_modules = ["Qwen2VLDecoderLayer", "Qwen2_5_VLVisionBlock"]
+    _no_split_modules = ["Qwen2VLDecoderLayer", "Qwen2_5_VLVisionBlock"]  # noqa: RUF012
 
     def __init__(self, config):
         super().__init__()
@@ -1892,7 +1892,7 @@ class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
 
         if not return_dict:
             output = (logits,)  # + outputs[1:]
-            return (loss,) + output if loss is not None else output
+            return (loss,) + output if loss is not None else output  # noqa: RUF005
 
         return Qwen2_5_VLCausalLMOutputWithPast(
             loss=loss,

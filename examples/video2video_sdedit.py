@@ -42,7 +42,6 @@ from imaginaire.constants import (
     CosmosPredict2Video2WorldResolution,
     get_cosmos_predict2_text2image_checkpoint,
     get_cosmos_predict2_video2world_checkpoint,
-    get_t5_model_dir,
 )
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.easy_io import easy_io
