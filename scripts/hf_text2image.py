@@ -21,6 +21,7 @@
 #   "accelerate",
 #   "cosmos-guardrail",
 #   "diffusers>=0.34.0",
+#   "rich",
 #   "transformers",
 # ]
 # [tool.uv]
@@ -94,8 +95,7 @@ def main():
         revision=args.revision,
         use_safetensors=True,
         torch_dtype=torch.bfloat16,
-    )
-    pipe.to("cuda")
+    ).to("cuda")
 
     print("Generating image...")
     output = pipe(

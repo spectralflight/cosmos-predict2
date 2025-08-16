@@ -52,3 +52,9 @@ repos:
     hooks:
       - id: markdown-link-check
         args: [--config, ".link-check.json", --quiet]
+  - repo: https://github.com/jendrikseipp/vulture
+    rev: v2.14
+    hooks:
+      - id: vulture
+        args: ["--sort-by-size", "."]
+        stages: [manual]
