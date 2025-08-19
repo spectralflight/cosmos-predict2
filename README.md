@@ -31,10 +31,16 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 ## Setup
 
 ```shell
+uv venv --seed --clear
+
+pip install "git+https://github.com/spectralflight/cosmos-predict2.git@spectralflight/PICBIR9W-1123-index-url#egg=cosmos-predict2[cu126]" --extra-index-url https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple/ --extra-index-url https://download.pytorch.org/whl/cu126
+
+uv pip install "git+https://github.com/spectralflight/cosmos-predict2.git@spectralflight/PICBIR9W-1123-index-url#egg=cosmos-predict2[cu126]" --extra-index-url https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple/ --extra-index-url https://download.pytorch.org/whl/cu126
+
 uv pip install --no-deps --no-build "flash-attn" --index-url https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple/
 
 
-uv venv --seed --clear
+
 
 uv pip install --no-deps --no-build "flash-attn" --index-url https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple/
 
