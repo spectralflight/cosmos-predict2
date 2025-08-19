@@ -110,6 +110,9 @@ no-build-isolation-package = [
 
 [tool.uv.sources]
 apex = { git = "https://github.com/spectralflight/apex.git", branch = "cosmos" }
+flash-attn = [
+  { index = "cosmos-cu126", extra = "cu126" },
+]
 flash-attn-3 = { git = "https://github.com/Dao-AILab/flash-attention.git", rev = "27f501d", subdirectory = "hopper" }
 torch = [
   { index = "pytorch-cu126", extra = "cu126" },
@@ -122,6 +125,11 @@ transformer-engine = { git = "https://github.com/NVIDIA/TransformerEngine.git", 
 [[tool.uv.index]]
 name = "pytorch-cu126"
 url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "cosmos-cu126"
+url = "https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple/"
 explicit = true
 
 [tool.uv.build-backend]
