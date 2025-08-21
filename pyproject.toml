@@ -132,7 +132,7 @@ explicit = true
 
 [[tool.uv.index]]
 name = "cosmos-cu126"
-url = "https://cosmos-dependencies-1ad5b3.gitlab-master-pages.nvidia.com/cu126_torch260/simple"
+url = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple"
 explicit = true
 
 [tool.uv.build-backend]
