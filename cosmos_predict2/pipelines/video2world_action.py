@@ -15,6 +15,7 @@
 
 from typing import Any
 
+from imaginaire.constants import TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_NUM_TOKENS
 import numpy as np
 import torch
 from megatron.core import parallel_state
@@ -197,7 +198,7 @@ class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
             "dataset_name": "video_data",
             "video": video,
             # NOTE: we don't use text embeddings for action conditional video2world
-            "t5_text_embeddings": torch.zeros(self.batch_size, 512, 1024, dtype=torch.bfloat16).cuda(),
+            "t5_text_embeddings": torch.zeros(self.batch_size, TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=torch.bfloat16).cuda(),
             "fps": torch.randint(16, 32, (self.batch_size,)),  # Random FPS (might be used by model)
             "padding_mask": torch.zeros(self.batch_size, 1, H, W),  # Padding mask (assumed no padding here)
             "num_conditional_frames": num_latent_conditional_frames,  # Specify number of conditional frames

@@ -27,6 +27,7 @@ from megatron.core import parallel_state
 from torch.distributed import get_process_group_ranks
 from tqdm import tqdm
 
+from imaginaire.constants import TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_NUM_TOKENS
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_multiview import (
@@ -319,29 +320,27 @@ class MultiviewPipeline(Video2WorldPipeline):
             dict: A dictionary containing the prepared data batch, moved to the correct device and dtype.
         """
         B, C, T, H, W = video.shape
+        t5_text_embeddings = torch.zeros(B, n_views * TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=self.torch_dtype).to(self.device)
         if prompt.endswith(".txt"):
             prompts = open(prompt).read().splitlines()
             assert len(prompts) == n_views, (
                 f"Number of prompts {len(prompts)} should be equal to number of views {n_views}"
             )
-            t5_text_embeddings_0 = self.encode_prompt(negative_prompt)
-            shape = t5_text_embeddings_0.shape
-            t5_text_embeddings = torch.zeros(B, n_views * shape[1], shape[2], dtype=self.torch_dtype).to(self.device)
             for i, prompt in enumerate(prompts):
                 if i != 0:
                     log.info(f"prompt for view {i} will not be used, skipping")
                     continue
                 log.info(f"{i}. encode prompt: {prompt}")
-                t5_text_embeddings[:, i * shape[1] : (i + 1) * shape[1]] = (
+                t5_text_embeddings[:, i * TEXT_ENCODER_NUM_TOKENS : (i + 1) * TEXT_ENCODER_NUM_TOKENS] = (
                     self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
                 )
         elif prompt.endswith(".pt"):
             t5_text_embeddings = torch.load(prompt)
-            assert t5_text_embeddings.shape[1] == n_views * 512, (
-                f"t5_text_embeddings.shape[1] {t5_text_embeddings.shape[1]} should be {n_views * 512}"
+            assert t5_text_embeddings.shape[1] == n_views * TEXT_ENCODER_NUM_TOKENS, (
+                f"t5_text_embeddings.shape[1] {t5_text_embeddings.shape[1]} should be {n_views * TEXT_ENCODER_NUM_TOKENS}"
             )
         else:
-            t5_text_embeddings = self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
+            t5_text_embeddings[:, 0:TEXT_ENCODER_NUM_TOKENS] = self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
         latent_view_indices_T = torch.repeat_interleave(torch.arange(n_views), self.config.state_t)
         latent_view_indices_B_T = latent_view_indices_T.unsqueeze(0).expand(B, -1).to(self.device)
 
@@ -360,12 +359,9 @@ class MultiviewPipeline(Video2WorldPipeline):
         # Handle negative prompts for classifier-free guidance
         if negative_prompt:
             log.warning("Negative prompt is only applied to the first view")
-
-            neg_t5_text_embeddings_0 = self.encode_prompt(negative_prompt)
-            shape = neg_t5_text_embeddings_0.shape
-            neg_t5_text_embeddings = torch.zeros(B, n_views * shape[1], shape[2], dtype=self.torch_dtype)
-            neg_t5_text_embeddings[:, 0 : shape[1]] = neg_t5_text_embeddings_0
-            data_batch["neg_t5_text_embeddings"] = neg_t5_text_embeddings.to(dtype=self.torch_dtype)
+            neg_t5_text_embeddings = torch.zeros(B, n_views * TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=self.torch_dtype).to(self.device)
+            neg_t5_text_embeddings[:, 0:TEXT_ENCODER_NUM_TOKENS] = self.encode_prompt(negative_prompt).to(dtype=self.torch_dtype)
+            data_batch["neg_t5_text_embeddings"] = neg_t5_text_embeddings
 
         # Move tensors to GPU and convert to bfloat16 if they are floating point
         for k, v in data_batch.items():

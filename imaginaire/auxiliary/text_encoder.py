@@ -28,7 +28,7 @@ from transformers import T5EncoderModel, T5TokenizerFast
 from typing_extensions import Self, override
 
 from imaginaire.configs.reason1.model_config_qwen import QwenModelConfig, QwenVisionConfig
-from imaginaire.constants import COSMOS_REASON1_PRIVATE_CHECKPOINT, T5_MODEL_DIR, TEXT_ENCODER_CLASS, TextEncoderClass
+from imaginaire.constants import COSMOS_REASON1_PRIVATE_CHECKPOINT, T5_MODEL_DIR, TEXT_ENCODER_CLASS, TEXT_ENCODER_NUM_TOKENS, TextEncoderClass
 from imaginaire.lazy_config import LazyCall as L
 from imaginaire.lazy_config import instantiate as lazy_instantiate
 from imaginaire.models.vlm_qwen import build_tokenizer
@@ -76,7 +76,7 @@ class CosmosTextEncoderBase(torch.nn.Module, abc.ABC):
     ) -> tuple[torch.Tensor, torch.Tensor]: ...
     @abc.abstractmethod
     def encode_prompts(
-        self, prompts: str | list[str], max_length: int = 512, return_mask: bool = False
+        self, prompts: str | list[str], max_length: int = TEXT_ENCODER_NUM_TOKENS, return_mask: bool = False
     ) -> torch.Tensor | tuple[torch.Tensor, torch.Tensor]:
         """Encodes text prompts into hidden state representations.
 
@@ -87,7 +87,7 @@ class CosmosTextEncoderBase(torch.nn.Module, abc.ABC):
         Args:
             prompts: Input text to encode. Can be a single string or a list of strings.
             max_length: Maximum sequence length for tokenization and padding. Longer
-                sequences will be truncated. Defaults to 512.
+                sequences will be truncated. Defaults to TEXT_ENCODER_NUM_TOKENS.
             return_mask: If True, returns the attention mask along with encoded text.
                 Defaults to False.
 

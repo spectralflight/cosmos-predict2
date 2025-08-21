@@ -16,6 +16,7 @@
 from contextlib import contextmanager
 from typing import Any
 
+from imaginaire.constants import TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_NUM_TOKENS
 import numpy as np
 import torch
 from einops import rearrange
@@ -48,7 +49,7 @@ def sample_batch_image(resolution: str = "1024", aspect_ratio: str = "16:9", bat
     data_batch = {
         "dataset_name": "image_data",
         "images": torch.randn(batch_size, 3, h, w).cuda(),
-        "t5_text_embeddings": torch.randn(batch_size, 512, 1024).cuda(),
+        "t5_text_embeddings": torch.randn(batch_size, TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM).cuda(),
         "fps": torch.randint(16, 32, (batch_size,)).cuda(),
         "padding_mask": torch.zeros(batch_size, 1, h, w).cuda(),
     }
@@ -213,7 +214,7 @@ class Text2ImagePipeline(BasePipeline):
     def denoising_model(self) -> MiniTrainDIT:
         return self.dit
 
-    def encode_prompt(self, prompts: str | list[str], max_length: int = 512, return_mask: bool = False) -> torch.Tensor:
+    def encode_prompt(self, prompts: str | list[str], max_length: int = TEXT_ENCODER_NUM_TOKENS, return_mask: bool = False) -> torch.Tensor:
         return self.text_encoder.encode_prompts(prompts, max_length=max_length, return_mask=return_mask)  # type: ignore
 
     @torch.no_grad()

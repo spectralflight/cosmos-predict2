@@ -21,7 +21,7 @@ import numpy as np
 from tqdm import tqdm
 
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder, CosmosT5TextEncoderConfig
-from imaginaire.constants import T5_MODEL_DIR
+from imaginaire.constants import T5_MODEL_DIR, T5_TEXT_ENCODER_NUM_TOKENS
 
 """example command
 python -m scripts.get_t5_embeddings_from_groot_dataset --dataset_path datasets/benchmark_train/gr1
@@ -36,7 +36,7 @@ def parse_args() -> argparse.ArgumentParser:
     parser.add_argument(
         "--prompt_prefix", type=str, default="The robot arm is performing a task. ", help="Prefix of the prompt"
     )
-    parser.add_argument("--max_length", type=int, default=512, help="Maximum length of the text embedding")
+    parser.add_argument("--max_length", type=int, default=T5_TEXT_ENCODER_NUM_TOKENS, help="Maximum length of the text embedding")
     parser.add_argument("--cache_dir", type=str, default=T5_MODEL_DIR, help="Directory to cache the T5 model")
     parser.add_argument(
         "--meta_csv", type=str, default="datasets/benchmark_train/gr1/metadata.csv", help="Metadata csv file"

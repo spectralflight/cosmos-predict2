@@ -16,6 +16,7 @@
 from contextlib import nullcontext
 from functools import partial
 
+from imaginaire.constants import TEXT_ENCODER_NUM_TOKENS
 import torch
 import torch.distributed as dist
 import torch.nn.functional as F
@@ -169,7 +170,7 @@ class EveryNDrawSampleMultiviewVideo(EveryNDrawSample):
         new_data_batch = {}
         num_video_frames_per_view = data_batch["num_video_frames_per_view"]
         new_total_frames = num_video_frames_per_view * n_views
-        new_total_t5_dim = 512 * n_views  # TODO: Remove hardcoded value
+        new_total_t5_dim = TEXT_ENCODER_NUM_TOKENS * n_views
         new_data_batch["video"] = data_batch["video"][:, :, 0:new_total_frames]
         new_data_batch["view_indices"] = data_batch["view_indices"][:, 0:new_total_frames]
         new_data_batch["sample_n_views"] = 0 * data_batch["sample_n_views"] + n_views
