@@ -15,7 +15,6 @@
 
 import math
 from dataclasses import dataclass
-from typing import List, Optional, Tuple, Union
 
 import omegaconf
 import torch
@@ -72,7 +71,7 @@ logger = logging.get_logger(__name__)
 _CONFIG_FOR_DOC = "Qwen2_5_VLConfig"
 
 
-def multinomial_sample_one(probs: torch.Tensor, rng: Optional[torch.Generator] = None) -> torch.Tensor:
+def multinomial_sample_one(probs: torch.Tensor, rng: torch.Generator | None = None) -> torch.Tensor:
     q = torch.empty_like(probs).exponential_(1, generator=rng)
     return torch.argmax(probs / q, dim=-1, keepdim=True).to(dtype=torch.long)
 
@@ -80,7 +79,7 @@ def multinomial_sample_one(probs: torch.Tensor, rng: Optional[torch.Generator] =
 def logits_to_probs(
     logits: torch.Tensor,
     temperature: float = 1.0,
-    top_k: Optional[int] = None,
+    top_k: int | None = None,
 ) -> torch.Tensor:
     logits = logits / max(temperature, 1e-5)
 
@@ -98,8 +97,8 @@ def generate_next_token(
     x: torch.Tensor,
     *,
     temperature: float = 1.0,
-    top_k: Optional[int] = None,
-    rng: Optional[torch.Generator] = None,
+    top_k: int | None = None,
+    rng: torch.Generator | None = None,
 ) -> torch.Tensor:
     logits = model(**x).logits  # (B, T, vocab_size)
     probs = logits_to_probs(logits[:, -1, :], temperature, top_k)
@@ -114,8 +113,8 @@ def generate(
     *,
     max_new_tokens: int,
     temperature: float = 1.0,
-    top_k: Optional[int] = None,
-    seed: Optional[int] = None,
+    top_k: int | None = None,
+    seed: int | None = None,
 ) -> torch.Tensor:
     # ensure batch dimension (T,) --> (B, T)
     input_ids = inputs["input_ids"]
@@ -126,7 +125,7 @@ def generate(
     generated_tokens = input_ids.clone()
 
     num_input_ids = inputs["input_ids"].shape[1]
-    for i in range(max_new_tokens):
+    for i in range(max_new_tokens):  # noqa: B007
         # Update attention mask
         inputs["attention_mask"] = torch.ones_like(inputs["input_ids"])
         next_token = generate_next_token(
@@ -199,7 +198,7 @@ class Qwen2_5_VisionRotaryEmbedding(nn.Module):
         self.register_buffer("inv_freq", inv_freq, persistent=False)
         self.dim = dim
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         if buffer_device is None:
             device = self.inv_freq.device
         else:
@@ -247,7 +246,7 @@ class Qwen2_5_VLPatchMerger(nn.Module):
         x = self.mlp(self.ln_q(x).view(-1, self.hidden_size))
         return x
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         pass
 
 
@@ -368,7 +367,7 @@ class Qwen2_5_VLVisionBlock(nn.Module):
 
 class Qwen2_5_VisionTransformerPretrainedModel(nn.Module):
     config_class = Qwen2_5_VLVisionConfig
-    _no_split_modules = ["Qwen2_5_VLVisionBlock"]
+    _no_split_modules = ["Qwen2_5_VLVisionBlock"]  # noqa: RUF012
 
     def __init__(self, config) -> None:
         super().__init__()
@@ -401,7 +400,7 @@ class Qwen2_5_VisionTransformerPretrainedModel(nn.Module):
         )
         self.gradient_checkpointing = False
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         self.rotary_pos_emb.init_weights(buffer_device)
 
     def rot_pos_emb(self, grid_thw):
@@ -554,7 +553,7 @@ class Qwen2_5_VLRotaryEmbedding(nn.Module):
         self.register_buffer("inv_freq", inv_freq, persistent=False)
         self.original_inv_freq = self.inv_freq
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         if buffer_device is None:
             device = self.inv_freq.device
         else:
@@ -669,7 +668,7 @@ class Qwen2_5_VLAttention(nn.Module):
     and "Generating Long Sequences with Sparse Transformers".
     """
 
-    def __init__(self, config: Qwen2_5_VLConfig, layer_idx: Optional[int] = None):
+    def __init__(self, config: Qwen2_5_VLConfig, layer_idx: int | None = None):
         super().__init__()
         self.config = config
         self.layer_idx = layer_idx
@@ -707,14 +706,14 @@ class Qwen2_5_VLAttention(nn.Module):
     def forward(
         self,
         hidden_states: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Cache] = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_value: Cache | None = None,
         output_attentions: bool = False,
         use_cache: bool = False,
-        cache_position: Optional[torch.LongTensor] = None,
-        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
-    ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+        cache_position: torch.LongTensor | None = None,
+        position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None,  # necessary, but kept here for BC
+    ) -> tuple[torch.Tensor, torch.Tensor | None, tuple[torch.Tensor] | None]:
         bsz, q_len, _ = hidden_states.size()
 
         query_states = self.q_proj(hidden_states)
@@ -795,13 +794,13 @@ class Qwen2_5_VLFlashAttention2(Qwen2_5_VLAttention):
     def forward(
         self,
         hidden_states: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Cache] = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_value: Cache | None = None,
         output_attentions: bool = False,
         use_cache: bool = False,
-        cache_position: Optional[torch.LongTensor] = None,
-        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
+        cache_position: torch.LongTensor | None = None,
+        position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None,  # necessary, but kept here for BC
         cp_mesh: DeviceMesh | None = None,
     ):
         """
@@ -911,15 +910,15 @@ class Qwen2_5_VLSdpaAttention(Qwen2_5_VLAttention):
     def forward(
         self,
         hidden_states: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Cache] = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_value: Cache | None = None,
         output_attentions: bool = False,
         use_cache: bool = False,
-        cache_position: Optional[torch.LongTensor] = None,
-        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
+        cache_position: torch.LongTensor | None = None,
+        position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None,  # necessary, but kept here for BC
         cp_mesh: DeviceMesh | None = None,
-    ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
+    ) -> tuple[torch.Tensor, torch.Tensor | None, tuple[torch.Tensor] | None]:
         if output_attentions:
             # TODO: Improve this warning with e.g. `model.config.attn_implementation = "manual"` once this is implemented.
             logger.warning_once(
@@ -1024,16 +1023,16 @@ class Qwen2_5_VLDecoderLayer(nn.Module):
     def forward(
         self,
         hidden_states: torch.Tensor,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_value: Optional[Tuple[torch.Tensor]] = None,
-        output_attentions: Optional[bool] = False,
-        use_cache: Optional[bool] = False,
-        cache_position: Optional[torch.LongTensor] = None,
-        position_embeddings: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,  # necessary, but kept here for BC
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_value: tuple[torch.Tensor] | None = None,
+        output_attentions: bool | None = False,
+        use_cache: bool | None = False,
+        cache_position: torch.LongTensor | None = None,
+        position_embeddings: tuple[torch.Tensor, torch.Tensor] | None = None,  # necessary, but kept here for BC
         cp_mesh: DeviceMesh | None = None,
         **kwargs,
-    ) -> Tuple[torch.FloatTensor, Optional[Tuple[torch.FloatTensor, torch.FloatTensor]]]:
+    ) -> tuple[torch.FloatTensor, tuple[torch.FloatTensor, torch.FloatTensor] | None]:
         """
         Args:
             hidden_states (`torch.FloatTensor`): input to the layer of shape `(batch, seq_len, embed_dim)`
@@ -1126,7 +1125,7 @@ class Qwen2_5_VLModel(nn.Module):
         self.dtype = config.torch_dtype
         self.cp_mesh = None
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         self.rotary_emb.init_weights(buffer_device)
 
     def get_input_embeddings(self):
@@ -1141,16 +1140,16 @@ class Qwen2_5_VLModel(nn.Module):
     def forward(
         self,
         input_ids: torch.LongTensor = None,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
-        inputs_embeds: Optional[torch.FloatTensor] = None,
-        use_cache: Optional[bool] = None,
-        output_attentions: Optional[bool] = None,
-        output_hidden_states: Optional[bool] = None,
-        return_dict: Optional[bool] = None,
-        cache_position: Optional[torch.LongTensor] = None,
-    ) -> Union[Tuple, BaseModelOutputWithPast]:
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_values: list[torch.FloatTensor] | None = None,
+        inputs_embeds: torch.FloatTensor | None = None,
+        use_cache: bool | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        cache_position: torch.LongTensor | None = None,
+    ) -> tuple | BaseModelOutputWithPast:
         assert not self.gradient_checkpointing
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
@@ -1480,18 +1479,18 @@ class Qwen2_5_VLCausalLMOutputWithPast(ModelOutput):
             The rope index difference between sequence length and multimodal rope.
     """
 
-    loss: Optional[torch.FloatTensor] = None
+    loss: torch.FloatTensor | None = None
     logits: torch.FloatTensor = None
-    past_key_values: Optional[List[torch.FloatTensor]] = None
-    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
-    attentions: Optional[Tuple[torch.FloatTensor]] = None
-    rope_deltas: Optional[torch.LongTensor] = None
+    past_key_values: list[torch.FloatTensor] | None = None
+    hidden_states: tuple[torch.FloatTensor] | None = None
+    attentions: tuple[torch.FloatTensor] | None = None
+    rope_deltas: torch.LongTensor | None = None
 
 
 class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
-    _tied_weights_keys = ["lm_head.weight"]
+    _tied_weights_keys = ["lm_head.weight"]  # noqa: RUF012
     config_class = Qwen2_5_VLConfig
-    _no_split_modules = ["Qwen2VLDecoderLayer", "Qwen2_5_VLVisionBlock"]
+    _no_split_modules = ["Qwen2VLDecoderLayer", "Qwen2_5_VLVisionBlock"]  # noqa: RUF012
 
     def __init__(self, config):
         super().__init__()
@@ -1508,7 +1507,7 @@ class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
         # Initialize weights and apply final processing
         # self.post_init()
 
-    def init_weights(self, buffer_device: Optional[torch.device] = None):
+    def init_weights(self, buffer_device: torch.device | None = None):
         self.model.init_weights(buffer_device)
         self.visual.init_weights(buffer_device)
 
@@ -1535,12 +1534,12 @@ class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
 
     def get_rope_index(
         self,
-        input_ids: Optional[torch.LongTensor] = None,
-        image_grid_thw: Optional[torch.LongTensor] = None,
-        video_grid_thw: Optional[torch.LongTensor] = None,
-        second_per_grid_ts: Optional[torch.Tensor] = None,
-        attention_mask: Optional[torch.Tensor] = None,
-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+        input_ids: torch.LongTensor | None = None,
+        image_grid_thw: torch.LongTensor | None = None,
+        video_grid_thw: torch.LongTensor | None = None,
+        second_per_grid_ts: torch.Tensor | None = None,
+        attention_mask: torch.Tensor | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Calculate the 3D rope index based on image and video's temporal, height and width in LLM.
 
@@ -1715,23 +1714,23 @@ class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
     def forward(
         self,
         input_ids: torch.LongTensor = None,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
-        inputs_embeds: Optional[torch.FloatTensor] = None,
-        labels: Optional[torch.LongTensor] = None,
-        use_cache: Optional[bool] = None,
-        output_attentions: Optional[bool] = None,
-        output_hidden_states: Optional[bool] = None,
-        return_dict: Optional[bool] = None,
-        pixel_values: Optional[torch.Tensor] = None,
-        pixel_values_videos: Optional[torch.FloatTensor] = None,
-        image_grid_thw: Optional[torch.LongTensor] = None,
-        video_grid_thw: Optional[torch.LongTensor] = None,
-        rope_deltas: Optional[torch.LongTensor] = None,
-        cache_position: Optional[torch.LongTensor] = None,
-        second_per_grid_ts: Optional[torch.Tensor] = None,
-    ) -> Union[Tuple, Qwen2_5_VLCausalLMOutputWithPast]:
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_values: list[torch.FloatTensor] | None = None,
+        inputs_embeds: torch.FloatTensor | None = None,
+        labels: torch.LongTensor | None = None,
+        use_cache: bool | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        pixel_values: torch.Tensor | None = None,
+        pixel_values_videos: torch.FloatTensor | None = None,
+        image_grid_thw: torch.LongTensor | None = None,
+        video_grid_thw: torch.LongTensor | None = None,
+        rope_deltas: torch.LongTensor | None = None,
+        cache_position: torch.LongTensor | None = None,
+        second_per_grid_ts: torch.Tensor | None = None,
+    ) -> tuple | Qwen2_5_VLCausalLMOutputWithPast:
         r"""
         Args:
             labels (`torch.LongTensor` of shape `(batch_size, sequence_length)`, *optional*):
@@ -1893,7 +1892,7 @@ class Qwen2_5_VLForConditionalGenerationSimple(nn.Module):
 
         if not return_dict:
             output = (logits,)  # + outputs[1:]
-            return (loss,) + output if loss is not None else output
+            return (loss,) + output if loss is not None else output  # noqa: RUF005
 
         return Qwen2_5_VLCausalLMOutputWithPast(
             loss=loss,
@@ -1991,12 +1990,12 @@ __all__ = ["Qwen2_5_VLForConditionalGenerationSimple"]
 
 def get_rope_index(
     model_config,
-    input_ids: Optional[torch.LongTensor] = None,
-    image_grid_thw: Optional[torch.LongTensor] = None,
-    video_grid_thw: Optional[torch.LongTensor] = None,
-    second_per_grid_ts: Optional[torch.Tensor] = None,
-    attention_mask: Optional[torch.Tensor] = None,
-) -> Tuple[torch.Tensor, torch.Tensor]:
+    input_ids: torch.LongTensor | None = None,
+    image_grid_thw: torch.LongTensor | None = None,
+    video_grid_thw: torch.LongTensor | None = None,
+    second_per_grid_ts: torch.Tensor | None = None,
+    attention_mask: torch.Tensor | None = None,
+) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Calculate the 3D rope index based on image and video's temporal, height and width in LLM.
 

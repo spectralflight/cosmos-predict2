@@ -17,7 +17,7 @@ import functools
 import itertools
 import math
 from copy import deepcopy
-from typing import Any, Dict, List
+from typing import Any
 
 import torch
 import torch.nn as nn
@@ -30,7 +30,7 @@ from imaginaire.utils import log
 from imaginaire.utils.fused_adam import FusedAdam
 
 
-def _optimizer_cls(params: List[nn.Parameter], optimizer_kwargs: Dict[str, Any], name: str):
+def _optimizer_cls(params: list[nn.Parameter], optimizer_kwargs: dict[str, Any], name: str):
     if name == "Adam":
         # TODO: make the optimizer options configurable by toml/cmd args
         optimizer = torch.optim.Adam(params, **optimizer_kwargs)
@@ -57,8 +57,8 @@ class OptimizersContainer(Stateful):
 
     def __init__(
         self,
-        model_parts: List[nn.Module],
-        optimizer_kwargs: Dict[str, Any],
+        model_parts: list[nn.Module],
+        optimizer_kwargs: dict[str, Any],
         name: str,
         lr_multiplier: list[float],
         model_part_names: list[str],
@@ -98,9 +98,9 @@ class OptimizersContainer(Stateful):
         for optimizer in itertools.chain(*self.optimizers):
             optimizer.zero_grad(set_to_none=set_to_none)
 
-    def state_dict(self) -> Dict[str, Any]:
+    def state_dict(self) -> dict[str, Any]:
         sd = {}
-        for model, optimizers in zip(self.model_parts, self.optimizers):
+        for model, optimizers in zip(self.model_parts, self.optimizers, strict=False):
             sd.update(
                 get_optimizer_state_dict(
                     model=model,
@@ -110,8 +110,8 @@ class OptimizersContainer(Stateful):
             )
         return sd
 
-    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
-        for model, optimizers in zip(self.model_parts, self.optimizers):
+    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
+        for model, optimizers in zip(self.model_parts, self.optimizers, strict=False):
             set_optimizer_state_dict(
                 model=model,
                 optimizers=optimizers,
@@ -125,11 +125,11 @@ class OptimizersInBackwardContainer(OptimizersContainer):
 
     def __init__(
         self,
-        model_parts: List[nn.Module],
-        optimizer_kwargs: Dict[str, Any],
+        model_parts: list[nn.Module],
+        optimizer_kwargs: dict[str, Any],
         name: str,
-        lr_multiplier: list[float] = [1.0, 1.0, 1.0],
-        model_part_names: list[str] = [],
+        lr_multiplier: list[float] = [1.0, 1.0, 1.0],  # noqa: B006
+        model_part_names: list[str] = [],  # noqa: B006
     ) -> None:
         self.model_parts = model_parts
         self.optimizers = [None for _ in self.model_parts]
@@ -162,7 +162,7 @@ class OptimizersInBackwardContainer(OptimizersContainer):
 
 # consider split between PP and non-PP
 def build_optimizers(
-    model_parts: List[nn.Module],
+    model_parts: list[nn.Module],
     job_config: FSDP2ModelConfig,
     lr_multiplier: list[float],
     model_part_names: list[str],
@@ -170,9 +170,9 @@ def build_optimizers(
     """Wrap one optimizer per model part in an OptimizersContainer which provides a single
     step() and zero_grad() method for all the child optimizers.
     """
-    assert (
-        len(model_parts) == len(lr_multiplier) == len(model_part_names)
-    ), "lr_multiplier and model_part_names must have the same length as model_parts"
+    assert len(model_parts) == len(lr_multiplier) == len(model_part_names), (
+        "lr_multiplier and model_part_names must have the same length as model_parts"
+    )
     optim_in_bwd = job_config.optimizer.early_step_in_backward
     if optim_in_bwd and job_config.experimental.pipeline_parallel_degree > 1:
         raise NotImplementedError("Optimizers in backward is not supported with pipeline parallelism.")
@@ -203,17 +203,17 @@ class SchedulersContainer(Stateful):
             self.schedulers.append(LambdaLR(optimizer, lr_lambda=lr_lambda))
 
     def step(self) -> None:
-        for id, scheduler in enumerate(self.schedulers):
+        for id, scheduler in enumerate(self.schedulers):  # noqa: B007
             scheduler.step()
 
-    def state_dict(self) -> Dict[str, Any]:
+    def state_dict(self) -> dict[str, Any]:
         # Currently, we have one scheduler per optimizer. However, when using MultiSchedule PP or optimizer-in-backward,
         # there are multiple optimizers and schedulers, but the scheduler state_dict remains the same for all.
         # Therefore, we only save the first one and later load it for all.
         assert len(self.schedulers) > 0, "Must have at least one scheduler to save state_dict"
         return self.schedulers[0].state_dict()
 
-    def load_state_dict(self, state_dict: Dict[str, Any]) -> None:
+    def load_state_dict(self, state_dict: dict[str, Any]) -> None:
         # Load the same state_dict for all schedulers. The key value we're concerned with in scheduler.state_dict() is `last_epoch`,
         # which is an integer that will be automatically copied. As long as `training.steps` and `training.warmup_steps` remain
         # unchanged when resuming from a checkpoint, this approach is safe. We call `.copy()` here to ensure extra safety.
@@ -225,12 +225,12 @@ class SchedulersContainer(Stateful):
         # But we have different learning rate for each scheduler, so we need to step them separately instead of loading the state dict
         # The benefit of this approach is that we can resume from a checkpoint even if the learning rate is changed
         for idx, scheduler in enumerate(self.schedulers):
-            for step in range(_step_count):
+            for step in range(_step_count):  # noqa: B007
                 scheduler.step()  # Step forward to match previous training state
-            log.info(f"Scheduler {idx+1}/{len(self.schedulers)} stepped {_step_count} times.")
+            log.info(f"Scheduler {idx + 1}/{len(self.schedulers)} stepped {_step_count} times.")
             log.info(f"Updated learning rate: {scheduler.get_last_lr()}")
 
-    def get_last_lr(self) -> List[float]:
+    def get_last_lr(self) -> list[float]:
         return [scheduler.get_last_lr() for scheduler in self.schedulers]
 
 

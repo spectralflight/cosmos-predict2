@@ -29,9 +29,10 @@ from torch.distributed.tensor.parallel import (
     parallelize_module,
 )
 
-from imaginaire.utils import log as logger
+from imaginaire.configs.reason1.model_config import ActivationCheckpointConfig
+from imaginaire.configs.reason1.model_config import FSDP2ModelConfig as JobConfig
 from imaginaire.models.parallelisms.parallel_dims import ParallelDims
-from imaginaire.configs.reason1.model_config import ActivationCheckpointConfig, FSDP2ModelConfig as JobConfig
+from imaginaire.utils import log as logger
 
 TORCH_DTYPE_MAP = {
     "float16": torch.float16,
@@ -352,10 +353,10 @@ def apply_fsdp(
         dp_mesh (DeviceMesh): The device mesh to use for data parallelism.
     """
 
-    for layer_id, block in enumerate(model.visual.blocks):
+    for layer_id, block in enumerate(model.visual.blocks):  # noqa: B007
         fully_shard(block, mesh=dp_mesh)
 
-    for layer_id, transformer_block in enumerate(model.model.layers):
+    for layer_id, transformer_block in enumerate(model.model.layers):  # noqa: B007
         fully_shard(
             transformer_block,
             mesh=dp_mesh,

@@ -45,6 +45,14 @@ log.debug(f"Cosmos Predict2 args: {_args}")
 
 # Feature flags
 TEXT_ENCODER_CLASS: TextEncoderClass = _args.text_encoder
+if TEXT_ENCODER_CLASS == TextEncoderClass.COSMOS_REASON1:
+    TEXT_ENCODER_EMBED_DIM = 1024
+    TEXT_ENCODER_NUM_TOKENS = 1024
+elif TEXT_ENCODER_CLASS == TextEncoderClass.T5:
+    TEXT_ENCODER_EMBED_DIM = 1024
+    TEXT_ENCODER_NUM_TOKENS = 512
+else:
+    raise ValueError(f"Invalid text encoder class: {TEXT_ENCODER_CLASS}")
 
 # Checkpoints
 CHECKPOINTS_DIR = _args.checkpoints
