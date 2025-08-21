@@ -3,11 +3,20 @@
 ## System Requirements
 
 * NVIDIA GPUs with Ampere architecture (RTX 30 Series, A100) or newer
-* Linux operating system (Ubuntu 20.04, 22.04, or 24.04 LTS)
-* CUDA version 12.4 or later
-* Python version 3.10 or later
+* NVIDIA driver compatible with CUDA 12.6
+* Linux
 
 ## Installation
+
+Install system dependencies:
+
+[just](https://just.systems/man/en/pre-built-binaries.html#pre-built-binaries)
+
+```shell
+mkdir -p "$HOME/.local"
+curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to "$HOME/.local/bin"
+export PATH="$HOME/.local/bin:$PATH"
+```
 
 ### Clone the repository
 
@@ -24,26 +33,36 @@ The installation will be handled by the Conda scripts or Dockerfile.
 
 ### Option 1: Virtual environment
 
+System requirements:
+
+* Linux x86-64
+* glibc>=2.31 (e.g Ubuntu >=20.04)
+
 Install system dependencies:
 
-* [uv](https://docs.astral.sh/uv/getting-started/installation/)
+[pkgx](https://docs.pkgx.sh/pkgx/installing-pkgx)
 
-  ```shell
-  curl -LsSf https://astral.sh/uv/install.sh | sh
-  source $HOME/.local/bin/env
-  ```
+```shell
+curl -sSf https://pkgx.sh | sh
+```
 
-* [arm only] decord
+[uv](https://docs.astral.sh/uv/getting-started/installation/)
 
-   ```sh
-   bash scripts/install_decord_arm.sh
-   ```
+```shell
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
 
-Install the package:
+Install the package into a new environment:
 
 ```shell
 uv sync
 source .venv/bin/activate
+```
+
+Or, install the package into the active environment (e.g. conda):
+
+```shell
+uv sync --active
 ```
 
 ### Option 2: Docker container
@@ -64,6 +83,10 @@ just docker
 4. Accept the [Llama-Guard-3-8B terms](https://huggingface.co/meta-llama/Llama-Guard-3-8B).
 
 To download a specific model:
+
+```shell
+./scripts/download_checkpoints.py --model_types <model_type> --model_sizes <model_size>
+```
 
 | Models | Link | Download Arguments | Notes |
 |--------|------|--------------------|-------|
