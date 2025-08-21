@@ -15,6 +15,7 @@
 """
 Adopted from https://github.com/QwenLM/Qwen2.5-VL/tree/main/qwen-vl-utils
 """
+
 from __future__ import annotations
 
 import base64
@@ -27,7 +28,6 @@ import time
 import warnings
 from functools import lru_cache
 from io import BytesIO
-from typing import Optional
 
 import requests
 import torch
@@ -219,7 +219,7 @@ def _read_video_torchvision(
     video_path = ele["video"]
     if version.parse(torchvision.__version__) < version.parse("0.19.0"):
         if "http://" in video_path or "https://" in video_path:
-            warnings.warn("torchvision < 0.19.0 does not support http/https video path, please upgrade to 0.19.0.")
+            warnings.warn("torchvision < 0.19.0 does not support http/https video path, please upgrade to 0.19.0.")  # noqa: B028
         if "file://" in video_path:
             video_path = video_path[7:]
     st = time.time()
@@ -492,8 +492,7 @@ def extract_vision_info(conversations: list[dict] | list[list[dict]]) -> list[di
 def process_vision_info(
     conversations: list[dict] | list[list[dict]],
     return_video_kwargs: bool = False,
-) -> tuple[list[Image.Image] | None, list[torch.Tensor | list[Image.Image]] | None, Optional[dict]]:
-
+) -> tuple[list[Image.Image] | None, list[torch.Tensor | list[Image.Image]] | None, dict | None]:
     vision_infos = extract_vision_info(conversations)
     # Read images or videos
     image_inputs = []

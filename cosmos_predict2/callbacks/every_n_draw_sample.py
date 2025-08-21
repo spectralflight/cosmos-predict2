@@ -32,6 +32,7 @@ from imaginaire.model import ImaginaireModel
 from imaginaire.utils import distributed, log, misc
 from imaginaire.utils.easy_io import easy_io
 from imaginaire.utils.parallel_state_helper import is_tp_cp_pp_rank0
+from imaginaire.visualize.video import save_img_or_video
 
 # from imaginaire.visualize.video import save_img_or_video
 # from projects.cosmos.diffusion.v2.datasets.data_sources.item_datasets_for_validation import get_itemdataset_option
@@ -309,7 +310,7 @@ class EveryNDrawSample(EveryN):
 
         # ! we only save first n_sample_to_save video!
         if self.save_s3 and self.data_parallel_id < self.n_sample_to_save:
-            save_img_or_video(  # noqa: F821
+            save_img_or_video(
                 rearrange(to_show, "n b c t h w -> c t (n h) (b w)"),
                 f"s3://rundir/{self.name}/{base_fp_wo_ext}",
                 fps=self.fps,

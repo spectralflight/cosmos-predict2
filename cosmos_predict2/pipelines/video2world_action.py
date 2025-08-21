@@ -327,6 +327,8 @@ class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
 
         # Run video guardrail on the generated video and apply postprocessing
         if self.video_guardrail_runner is not None:
+            from cosmos_predict2.auxiliary.guardrail.common import presets as guardrail_presets
+
             # Clamp to safe range before normalization
             video = video.clamp(-1.0, 1.0)
             video_normalized = (video + 1) / 2  # [0, 1]
@@ -337,7 +339,7 @@ class Video2WorldActionConditionedPipeline(Video2WorldPipeline):
             frames = frames.permute(1, 2, 3, 0).cpu().numpy()  # (T, H, W, C)
 
             # Run guardrail
-            processed_frames = guardrail_presets.run_video_guardrail(frames, self.video_guardrail_runner)  # noqa: F821
+            processed_frames = guardrail_presets.run_video_guardrail(frames, self.video_guardrail_runner)
             if processed_frames is None:
                 return None
             else:

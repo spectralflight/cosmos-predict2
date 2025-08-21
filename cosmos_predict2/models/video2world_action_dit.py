@@ -20,6 +20,7 @@ from einops import rearrange
 
 from cosmos_predict2.conditioner import DataType
 from cosmos_predict2.models.video2world_dit import MinimalV1LVGDiT
+from imaginaire.utils.graph import create_cuda_graph
 
 
 class Mlp(nn.Module):
@@ -124,7 +125,7 @@ class ActionConditionedMinimalV1LVGDiT(MinimalV1LVGDiT):
             )
 
         if use_cuda_graphs:
-            shapes_key = create_cuda_graph(  # noqa: F821
+            shapes_key = create_cuda_graph(
                 self.cuda_graphs,
                 self.blocks,
                 x_B_T_H_W_D,

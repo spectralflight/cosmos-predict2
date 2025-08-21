@@ -1,12 +1,26 @@
-from enum import Enum
-import os
-from typing import Any, Dict, List, Optional
+# SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-import filelock
-from torch import distributed
-from imaginaire.utils.qwen_vl_utils import extract_vision_info, process_vision_info
+import os
+from typing import Any
+
+import numpy as np
 import torch
 import torch.distributed as dist
+import torch.nn as nn
+from torch import distributed
 from torch.distributed._tensor import DTensor, Shard
 from torch.distributed.tensor.device_mesh import DeviceMesh
 from torch.nn import functional as F
@@ -14,20 +28,21 @@ from transformers.models.auto.processing_auto import AutoProcessor
 
 from imaginaire.configs.reason1.model_config import FSDP2ModelConfig
 from imaginaire.constants import COSMOS_REASON1_PRIVATE_TOKENIZER
+from imaginaire.models.parallelisms.optimizer import build_lr_schedulers, build_optimizers
+from imaginaire.models.parallelisms.parallel_dims import ParallelDims
+from imaginaire.models.parallelisms.parallelize_qwen import parallelize_qwen
+from imaginaire.networks.qwen2_5_vl import Qwen2_5_VisionTransformerPretrainedModel, Qwen2_5_VLModel
+from imaginaire.networks.qwen2_5_vl import get_rope_index as get_rope_index_v2
+from imaginaire.networks.qwen2_5_vl import get_rope_index as get_rope_index_v2_5
+from imaginaire.networks.qwen2_vl import Qwen2VisionTransformerPretrainedModel, Qwen2VLModel
 from imaginaire.utils import log
 from imaginaire.utils.checkpointer import _IncompatibleKeys
 from imaginaire.utils.parallelism import broadcast_to_cp_or_tp_ranks
-from imaginaire.networks.qwen2_5_vl import Qwen2_5_VisionTransformerPretrainedModel, Qwen2_5_VLModel, get_rope_index as get_rope_index_v2_5, get_rope_index as get_rope_index_v2
-from imaginaire.networks.qwen2_vl import Qwen2VisionTransformerPretrainedModel, Qwen2VLModel
-from imaginaire.models.parallelisms.optimizer import build_optimizers, build_lr_schedulers
-from imaginaire.models.parallelisms.parallelize_qwen import parallelize_qwen
-from imaginaire.models.parallelisms.parallel_dims import ParallelDims
-from imaginaire.utils.torchtitan_utils import device_type, device_module
-import numpy as np
-import torch.nn as nn
-
+from imaginaire.utils.qwen_vl_utils import extract_vision_info, process_vision_info
+from imaginaire.utils.torchtitan_utils import device_module, device_type
 
 _LOCK_TIMEOUT_SECONDS = 60
+
 
 class Processor:
     # This is a wrapper around the AutoProcessor class to add some helper functions
@@ -136,7 +151,7 @@ class Processor:
             assert len(start_indices) == len(end_indices)
             # For each pair of bos/eos, check if the role is 'assistant'
             # and apply the mask accordingly.
-            for start, end in zip(start_indices, end_indices):
+            for start, end in zip(start_indices, end_indices, strict=False):
                 if np_tokens[start + 1] == role_id:
                     # Mask tokens from after the assistant header (start+3) to include the end marker (end+1)
                     masks[start + START_OFFSET : end + END_OFFSET] = True
@@ -176,7 +191,7 @@ class VLMBaseModel(torch.nn.Module):
         self,
         model_config: FSDP2ModelConfig,
         tokenizer: Processor,
-    ) -> "AutoRegressiveModel":
+    ):
         super().__init__()
         """
         Build a AutoRegressiveModel instance by initializing and loading a model checkpoint.
@@ -185,8 +200,6 @@ class VLMBaseModel(torch.nn.Module):
             model_config (FSDP2ModelConfig): The model configuration for the AutoRegressiveModel instance.
             tokenizer (Tokenizer): The tokenizer for the AutoRegressiveModel instance.
             download_rank_sync (bool, optional): Whether to download the checkpoint in a rank-synchronized manner. Defaults to True.
-        Returns:
-            AutoRegressiveModel: An instance of the AutoRegressiveModel class with the loaded model and tokenizer.
 
         Raises:
             AssertionError: If there are no checkpoint files in the specified directory.
@@ -302,7 +315,7 @@ class VLMBaseModel(torch.nn.Module):
         n_params = sum(p.numel() for p in self.parameters())
         return n_params
 
-    def load_state_dict(self, state_dict: Dict[str, Any], strict: bool = True, assign: bool = False):
+    def load_state_dict(self, state_dict: dict[str, Any], strict: bool = True, assign: bool = False):
         """
         Ignore the missing keys with substrings matching `substring_to_ignore` (e.g., "_extra_state" keys imposed by
         TransformerEngine for FP8).
@@ -324,7 +337,7 @@ class VLMBaseModel(torch.nn.Module):
 
     def init_weights(
         self,
-        buffer_device: Optional[torch.device] = None,
+        buffer_device: torch.device | None = None,
     ):
         self.model.init_weights(buffer_device)
         if self.vision_encoder is not None:
@@ -494,7 +507,7 @@ class VLMBaseModel(torch.nn.Module):
     def build_model(self, model_config):
         raise NotImplementedError
 
-    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:
+    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:  # noqa: B006
         """
         The forward pass of the model.
         Returns:
@@ -637,22 +650,22 @@ class QwenModel(VLMBaseModel):
     def _forward(
         self,
         input_ids: torch.LongTensor = None,
-        attention_mask: Optional[torch.Tensor] = None,
-        position_ids: Optional[torch.LongTensor] = None,
-        past_key_values: Optional[List[torch.FloatTensor]] = None,
-        inputs_embeds: Optional[torch.FloatTensor] = None,
-        labels: Optional[torch.LongTensor] = None,
-        use_cache: Optional[bool] = None,
-        output_attentions: Optional[bool] = None,
-        output_hidden_states: Optional[bool] = None,
-        return_dict: Optional[bool] = None,
-        pixel_values: Optional[torch.Tensor] = None,
-        pixel_values_videos: Optional[torch.FloatTensor] = None,
-        image_grid_thw: Optional[torch.LongTensor] = None,
-        video_grid_thw: Optional[torch.LongTensor] = None,
-        rope_deltas: Optional[torch.LongTensor] = None,
-        cache_position: Optional[torch.LongTensor] = None,
-        second_per_grid_ts: Optional[torch.Tensor] = None,
+        attention_mask: torch.Tensor | None = None,
+        position_ids: torch.LongTensor | None = None,
+        past_key_values: list[torch.FloatTensor] | None = None,
+        inputs_embeds: torch.FloatTensor | None = None,
+        labels: torch.LongTensor | None = None,
+        use_cache: bool | None = None,
+        output_attentions: bool | None = None,
+        output_hidden_states: bool | None = None,
+        return_dict: bool | None = None,
+        pixel_values: torch.Tensor | None = None,
+        pixel_values_videos: torch.FloatTensor | None = None,
+        image_grid_thw: torch.LongTensor | None = None,
+        video_grid_thw: torch.LongTensor | None = None,
+        rope_deltas: torch.LongTensor | None = None,
+        cache_position: torch.LongTensor | None = None,
+        second_per_grid_ts: torch.Tensor | None = None,
     ) -> torch.Tensor:
         r"""
         Args:
@@ -814,7 +827,7 @@ class QwenModel(VLMBaseModel):
             logits = DTensor.from_local(logits, device_mesh=self.cp_mesh, placements=[Shard(1)]).full_tensor()
         return logits
 
-    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:
+    def forward(self, tokens, data_batch={}, start_pos: int = 0) -> torch.Tensor:  # noqa: B006
         """
         The training step of the model, including the loss computation.
         """
@@ -859,7 +872,7 @@ class QwenModel(VLMBaseModel):
         return super().training_step(data_batch, iteration)
 
 
-def broadcast_object(local_str: List[str], cp_or_tp_mesh: DeviceMesh):
+def broadcast_object(local_str: list[str], cp_or_tp_mesh: DeviceMesh):
     """
     Broadcast a string to all ranks.
     """
