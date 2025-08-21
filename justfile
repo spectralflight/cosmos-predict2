@@ -18,7 +18,7 @@ lint: setup
 test: lint
 
 # Generate the ATTRIBUTIONS.txt file.
-license:
+license: install
   uvx licensecheck
   uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.txt
 
