@@ -24,7 +24,7 @@ license: install
 
 # Build the docker image.
 docker-build cuda_version='12.6.3' *args:
-  docker build --build-arg BASE_IMAGE="nvidia/cuda:{{cuda_version}}-cudnn-devel-ubuntu24.04" -t "cosmos-predict2:{{cuda_version}}" {{args}} .
+  docker build --build-arg BASE_IMAGE="nvidia/cuda:{{cuda_version}}-cudnn-devel-ubuntu24.04" -t "cosmos-predict2:{{cuda_version}}" {{args}} -f uv.Dockerfile .
 
 # Run the docker container.
 docker cuda_version='12.6.3' *args:
