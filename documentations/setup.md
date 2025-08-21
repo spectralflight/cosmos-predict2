@@ -33,89 +33,28 @@ Install system dependencies:
   source $HOME/.local/bin/env
   ```
 
-* [just](https://github.com/casey/just?tab=readme-ov-file#installation)
-
-  ```shell
-  pkgm install just
-  # or
-  conda install -c conda-forge just
-  ```
-
 * [arm only] decord
 
    ```sh
    bash scripts/install_decord_arm.sh
    ```
 
-Install the package using your preferred environment:
+Install the package:
 
-1. conda
-
-   Install system dependencies:
-
-   * conda: <https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html>
-
-   ```sh
-   just install-conda
-   conda activate cosmos-predict2
-   ```
-
-2. venv
-
-   Install system dependencies:
-
-   * CUDA 12.6: <https://developer.nvidia.com/cuda-12-6-0-download-archive>
-   * clang
-
-   ```sh
-   just install cu126
-   source .venv/bin/activate
-   ```
-
-[Optional] Install training dependencies
-
-```sh
-just install-training
+```shell
+uv sync
+source .venv/bin/activate
 ```
 
 ### Option 2: Docker container
 
 Please make sure you have access to Docker on your machine and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed.
 
-* **Option 2A: Use pre-built Cosmos-Predict2 container**
+Build and run the container:
 
-   ```bash
-   # Pull the Cosmos-Predict2 container
-   docker pull nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2
-   ```
-
-* **Option 2B: Build container from Dockerfile**
-
-   Make sure you are under the repo root.
-
-   ```bash
-   # Build the Docker image
-   docker build -t cosmos-predict2-local -f Dockerfile .
-   ```
-
-* **Running the container**
-
-   Use the following command to run either container, replacing `[CONTAINER_NAME]` with either `nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2` or `cosmos-predict2-local`:
-
-   ```bash
-   # Run the container with GPU support and mount necessary directories
-   docker run --gpus all -it --rm \
-   -v /path/to/cosmos-predict2:/workspace \
-   -v /path/to/datasets:/workspace/datasets \
-   -v /path/to/checkpoints:/workspace/checkpoints \
-   [CONTAINER_NAME]
-
-   # Verify setup inside container
-   export PYTHONPATH=$(pwd)
-   python /workspace/scripts/test_environment.py
-   ```
-
-   > **Note**: Replace `/path/to/cosmos-predict2`, `/path/to/datasets`, and `/path/to/checkpoints` with your actual local paths.
+```bash
+just docker
+```
 
 ## Downloading Checkpoints
 

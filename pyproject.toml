@@ -69,12 +69,13 @@ dependencies = [
   "webdataset==0.2.111",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 cu126 = [
-  "flash-attn==2.6.3",
-  "nvidia-nvtx-cu12==12.6.*",
   "torch==2.6.0",
   "torchvision==0.21.0",
+  "flash-attn==2.6.3",
+  "natten==0.21.0",
+  "transformer-engine==1.13",
   # https://github.com/astral-sh/uv/issues/14237
   # Dependencies determined from `uv pip install "torch==2.6.0" --index-url https://download.pytorch.org/whl/cu126`
   "nvidia-cublas-cu12==12.6.4.1",
@@ -97,19 +98,31 @@ homepage = "https://github.com/nvidia-cosmos/cosmos-predict2/"
 issues = "https://github.com/nvidia-cosmos/cosmos-predict2/issues"
 
 [tool.uv]
+default-groups = ["cu126"]
+environments = [
+  "python_version == '3.10' and sys_platform == 'linux' and platform_machine == 'x86_64'",
+]
 no-build-package = [
   "flash-attn",
+  "natten",
+  "transformer-engine",
 ]
 
 [tool.uv.sources]
 flash-attn = [
-  { index = "cosmos-cu126", extra = "cu126" },
+  { index = "cosmos-cu126", group = "cu126" },
+]
+natten = [
+  { index = "cosmos-cu126", group = "cu126" },
+]
+transformer-engine = [
+  { index = "cosmos-cu126", group = "cu126" },
 ]
 torch = [
-  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu126", group = "cu126" },
 ]
 torchvision = [
-  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu126", group = "cu126" },
 ]
 
 [[tool.uv.index]]
