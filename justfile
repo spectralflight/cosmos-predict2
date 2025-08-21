@@ -17,6 +17,11 @@ lint: setup
 # Run tests
 test: lint
 
+# Generate the ATTRIBUTIONS.txt file.
+license:
+  uvx licensecheck
+  uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.txt
+
 # Build the docker image.
 docker-build cuda_version='12.6.3' *args:
   docker build --build-arg BASE_IMAGE="nvidia/cuda:{{cuda_version}}-cudnn-devel-ubuntu24.04" -t "cosmos-predict2:{{cuda_version}}" {{args}} .
