@@ -8,16 +8,6 @@
 
 ## Installation
 
-Install system dependencies:
-
-[just](https://just.systems/man/en/pre-built-binaries.html#pre-built-binaries)
-
-```shell
-mkdir -p "$HOME/.local"
-curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to "$HOME/.local/bin"
-export PATH="$HOME/.local/bin:$PATH"
-```
-
 ### Clone the repository
 
 ```bash
@@ -39,12 +29,6 @@ System requirements:
 * glibc>=2.31 (e.g Ubuntu >=20.04)
 
 Install system dependencies:
-
-[pkgx](https://docs.pkgx.sh/pkgx/installing-pkgx)
-
-```shell
-curl -sSf https://pkgx.sh | sh
-```
 
 [uv](https://docs.astral.sh/uv/getting-started/installation/)
 
@@ -72,13 +56,14 @@ Please make sure you have access to Docker on your machine and the [NVIDIA Conta
 For x86-64, build and run the container:
 
 ```bash
-just docker
+docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it $(docker build -f uv.Dockerfile .)
 ```
 
 For arm, pull and run a pre-built container:
 
 ```bash
-just docker-arm
+docker pull nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2
+docker run --gpus all --rm -v .:/workspace -it cosmos-predict2:1.2
 ```
 
 ## Downloading Checkpoints

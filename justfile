@@ -24,14 +24,14 @@ license: install
 
 # Build the docker image.
 docker-build cuda_version='12.6.3' *args:
-  docker build --build-arg BASE_IMAGE="nvidia/cuda:{{cuda_version}}-cudnn-devel-ubuntu24.04" -t "cosmos-predict2:{{cuda_version}}" -f uv.Dockerfile {{args}} .
+  docker build --build-arg BASE_IMAGE="nvidia/cuda:{{cuda_version}}-cudnn-devel-ubuntu24.04" -t cosmos-predict2:{{cuda_version}} -f uv.Dockerfile {{args}} .
 
 # Run the docker container.
 docker cuda_version='12.6.3' *args:
   # https://github.com/astral-sh/uv-docker-example/blob/main/run.sh
   just -f {{justfile()}} docker-build "{{cuda_version}}"
-  docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it "cosmos-predict2:{{cuda_version}}" {{args}}
+  docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it cosmos-predict2:{{cuda_version}} {{args}}
 
 docker-arm *args:
   docker pull nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2
-  docker run --gpus all --rm -v .:/workspace -it "cosmos-predict2:1.2" {{args}}
+  docker run --gpus all --rm -v .:/workspace -it cosmos-predict2:1.2 {{args}}
