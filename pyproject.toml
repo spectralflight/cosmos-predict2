@@ -18,8 +18,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "cosmos_predict2"
-version = "1.0.7"
+name = "cosmos-predict2"
+version = "1.0.8"
 authors = [
   {name = "NVIDIA Corporation"},
 ]

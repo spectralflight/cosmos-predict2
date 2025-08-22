@@ -25,6 +25,7 @@ license:
 # Release a new version
 release pypi_token:
   just -f {{justfile()}} license
+  just -f {{justfile()}} lint
   uv version --bump patch
   rm -rf dist
   uv build

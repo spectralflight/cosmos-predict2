@@ -2,7 +2,7 @@
     <img src="assets/nvidia-cosmos-header.png" alt="NVIDIA Cosmos Header">
 </p>
 
-### Paper (coming soon!) | [Website](https://research.nvidia.com/labs/dir/cosmos-predict2/) | [Hugging Face](https://huggingface.co/collections/nvidia/cosmos-predict2-68028efc052239369a0f2959) | [PyPI](https://pypi.org/project/cosmos_predict2/)
+### Paper (coming soon!) | [Website](https://research.nvidia.com/labs/dir/cosmos-predict2/) | [Hugging Face](https://huggingface.co/collections/nvidia/cosmos-predict2-68028efc052239369a0f2959) | [PyPI](https://pypi.org/project/cosmos-predict2/)
 
 Cosmos-Predict2 is a key branch of the [Cosmos World Foundation Models](https://www.nvidia.com/en-us/ai/cosmos) (WFMs) ecosystem for Physical AI, specializing in future state prediction through advanced world modeling. It offers two powerful capabilities: text-to-image generation for creating high-quality images from text descriptions, and video-to-world generation for producing visual simulations from video inputs.
 
@@ -13,7 +13,7 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 </p>
 
 ## News
-* 2025-08-22: Cosmos-Predict2 is now available on [PyPI](https://pypi.org/project/cosmos_predict2/)!
+* 2025-08-22: Cosmos-Predict2 is now available on [PyPI](https://pypi.org/project/cosmos-predict2/)!
 * 2025-08-15: We released the [0.6B Text2Image](documentations/inference_text2image.md) model with fast tokenizer support!
 * 2025-07-10: We released [Predict2 + NATTEN](documentations/performance.md#sparse-attention-powered-by-natten), bringing up to 2.6X end-to-end inference speedup with sparse attention ([Video](https://www.youtube.com/watch?v=o396JZsz4V4)).
 * 2025-06-11: We released post-training and inference code, along with model weights. For a code walkthrough, please see this [video](https://www.youtube.com/watch?v=ibnVm6hPtxA).
