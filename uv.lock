@@ -234,7 +234,7 @@ wheels = [
 
 [[package]]
 name = "cosmos-predict2"
-version = "1.0.6"
+version = "1.0.7"
 source = { editable = "." }
 dependencies = [
     { name = "attrs", marker = "python_full_version < '3.11' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
