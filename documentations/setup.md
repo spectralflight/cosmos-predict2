@@ -34,6 +34,7 @@ Install system dependencies:
 
 ```shell
 curl -LsSf https://astral.sh/uv/install.sh | sh
+source $HOME/.local/bin/env
 ```
 
 Install the package into a new environment:

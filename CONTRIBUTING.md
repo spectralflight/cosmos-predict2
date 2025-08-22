@@ -28,6 +28,14 @@ To see all available commands, run
 just
 ```
 
+## Releasing
+
+```shell
+just version patch
+uv build
+uv publish
+```
+
 ## Code Reviews
 
 All submissions, including submissions by project members, require review. We use GitHub pull requests for this purpose. Consult
