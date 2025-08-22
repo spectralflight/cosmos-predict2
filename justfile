@@ -24,12 +24,7 @@ license:
 
 # Release a new version
 release pypi_token:
-  just -f {{justfile()}} license
-  just -f {{justfile()}} lint
-  uv version --bump patch
-  rm -rf dist
-  uv build
-  uv publish --token {{pypi_token}}
+  . bin/release.sh {{pypi_token}}
 
 # Build the docker image
 docker-build cuda_version='12.6.3' *args:
