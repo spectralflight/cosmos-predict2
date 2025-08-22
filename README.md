@@ -50,7 +50,7 @@ Cosmos-Predict2 can be installed with `pip` (requires `python==3.10`):
 
 ```shell
 uv venv --python 3.10 --allow-existing
-uv pip install -U "cosmos-predict2[cu126]==1.0.4" --extra-index-url https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple
+uv pip install -U "cosmos-predict2[cu126]" --extra-index-url https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple
 ```
 
 [Example Project](examples/project/README.md)
