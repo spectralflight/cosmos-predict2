@@ -17,10 +17,6 @@ lint: setup
 # Run tests
 test: lint
 
-# Update the version
-version *args:
-  uvx hatch version {{args}}
-
 # Update the license
 license: install
   uvx licensecheck

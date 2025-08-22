@@ -75,9 +75,9 @@ Run example inference scripts:
   ./scripts/hf_video2world.py output/hf_video2world --prompt "assets/video2world/example_prompt.txt" --image "assets/video2world/example_input.jpg" -v
   ```
 
-## Usage
+## Quick Start
 
-Here is a minimal example demonstrating how to use Cosmos-Predict2-2B-Video2World for video generation:
+Here is a quick example demonstrating how to use Cosmos-Predict2-2B-Video2World for video generation:
 
 ```python
 import torch
