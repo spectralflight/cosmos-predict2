@@ -18,7 +18,7 @@ lint: setup
 test: lint
 
 # Update the license
-license:
+license: install
   uvx licensecheck --show-only-failing --ignore-packages "nvidia-*" "hf-xet" --zero
   uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.txt
 
