@@ -62,17 +62,23 @@ source .venv/bin/activate
 Or, install the package into the active environment (e.g. conda):
 
 ```shell
-uv sync --active
+uv sync --active --inexact
 ```
 
 ### Option 2: Docker container
 
 Please make sure you have access to Docker on your machine and the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html) is installed.
 
-Build and run the container:
+For x86-64, build and run the container:
 
 ```bash
 just docker
+```
+
+For arm, pull and run a pre-built container:
+
+```bash
+just docker-arm
 ```
 
 ## Downloading Checkpoints
