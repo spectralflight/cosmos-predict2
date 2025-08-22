@@ -2,7 +2,7 @@
 
 # Release a new version
 
-if [ $# -ne 1 ]; then
+if [ $# -lt 1 ]; then
     echo "Usage: $0 <pypi_token>"
     exit 1
 fi
@@ -24,4 +24,4 @@ git tag "v$PACKAGE_VERSION"
 # Publish to PyPI
 rm -rf dist
 uv build
-uv publish --token "$PYPI_TOKEN"
+uv publish --token "$PYPI_TOKEN" "$@"

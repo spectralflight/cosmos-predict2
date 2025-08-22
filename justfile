@@ -23,8 +23,8 @@ license:
   uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.txt
 
 # Release a new version
-release pypi_token:
-  . bin/release.sh {{pypi_token}}
+release pypi_token='dry-run' *args:
+  ./bin/release.sh {{pypi_token}} {{args}}
 
 # Build the docker image
 docker-build cuda_version='12.6.3' *args:
