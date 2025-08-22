@@ -276,7 +276,7 @@ dependencies = [
     { name = "webdataset", marker = "python_full_version < '3.11' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
 ]
 
-[package.dev-dependencies]
+[package.optional-dependencies]
 cu126 = [
     { name = "flash-attn", marker = "python_full_version < '3.11' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
     { name = "natten", marker = "python_full_version < '3.11' and platform_machine == 'x86_64' and sys_platform == 'linux'" },
@@ -306,6 +306,7 @@ requires-dist = [
     { name = "decord", specifier = "==0.6.0" },
     { name = "diffusers", specifier = "==0.33.1" },
     { name = "einops", specifier = "==0.8.1" },
+    { name = "flash-attn", marker = "extra == 'cu126'", specifier = "==2.6.3", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", extra = "cu126" } },
     { name = "ftfy", specifier = "==6.3.1" },
     { name = "fvcore", specifier = "==0.1.5.post20221221" },
     { name = "huggingface-hub", specifier = "==0.32.4" },
@@ -317,9 +318,23 @@ requires-dist = [
     { name = "mediapy", specifier = "==1.2.2" },
     { name = "megatron-core", specifier = "==0.10.0" },
     { name = "modelscope", specifier = "==1.26.0" },
+    { name = "natten", marker = "extra == 'cu126'", specifier = "==0.21.0", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", extra = "cu126" } },
     { name = "nltk", specifier = "==3.9.1" },
     { name = "numpy", specifier = "==1.26.4" },
+    { name = "nvidia-cublas-cu12", marker = "extra == 'cu126'", specifier = "==12.6.4.1" },
+    { name = "nvidia-cuda-cupti-cu12", marker = "extra == 'cu126'", specifier = "==12.6.80" },
+    { name = "nvidia-cuda-nvrtc-cu12", marker = "extra == 'cu126'", specifier = "==12.6.77" },
+    { name = "nvidia-cuda-runtime-cu12", marker = "extra == 'cu126'", specifier = "==12.6.77" },
+    { name = "nvidia-cudnn-cu12", marker = "extra == 'cu126'", specifier = "==9.5.1.17" },
+    { name = "nvidia-cufft-cu12", marker = "extra == 'cu126'", specifier = "==11.3.0.4" },
+    { name = "nvidia-curand-cu12", marker = "extra == 'cu126'", specifier = "==10.3.7.77" },
+    { name = "nvidia-cusolver-cu12", marker = "extra == 'cu126'", specifier = "==11.7.1.2" },
+    { name = "nvidia-cusparse-cu12", marker = "extra == 'cu126'", specifier = "==12.5.4.2" },
+    { name = "nvidia-cusparselt-cu12", marker = "extra == 'cu126'", specifier = "==0.6.3" },
     { name = "nvidia-ml-py", specifier = "==12.535.133" },
+    { name = "nvidia-nccl-cu12", marker = "extra == 'cu126'", specifier = "==2.21.5" },
+    { name = "nvidia-nvjitlink-cu12", marker = "extra == 'cu126'", specifier = "==12.6.85" },
+    { name = "nvidia-nvtx-cu12", marker = "extra == 'cu126'", specifier = "==12.6.77" },
     { name = "omegaconf", specifier = "==2.3.0" },
     { name = "opencv-python", specifier = "==4.10.0.84" },
     { name = "pandas", specifier = "==2.2.3" },
@@ -336,33 +351,15 @@ requires-dist = [
     { name = "sentencepiece", specifier = "==0.2.0" },
     { name = "setuptools" },
     { name = "termcolor", specifier = "==2.5.0" },
+    { name = "torch", marker = "extra == 'cu126'", specifier = "==2.6.0", index = "https://download.pytorch.org/whl/cu126", conflict = { package = "cosmos-predict2", extra = "cu126" } },
+    { name = "torchvision", marker = "extra == 'cu126'", specifier = "==0.21.0", index = "https://download.pytorch.org/whl/cu126", conflict = { package = "cosmos-predict2", extra = "cu126" } },
     { name = "tqdm", specifier = "==4.66.5" },
+    { name = "transformer-engine", marker = "extra == 'cu126'", specifier = "==1.13", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", extra = "cu126" } },
     { name = "transformers", specifier = "==4.51.3" },
     { name = "triton", specifier = "==3.2.0" },
     { name = "webdataset", specifier = "==0.2.111" },
 ]
-
-[package.metadata.requires-dev]
-cu126 = [
-    { name = "flash-attn", specifier = "==2.6.3", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", group = "cu126" } },
-    { name = "natten", specifier = "==0.21.0", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", group = "cu126" } },
-    { name = "nvidia-cublas-cu12", specifier = "==12.6.4.1" },
-    { name = "nvidia-cuda-cupti-cu12", specifier = "==12.6.80" },
-    { name = "nvidia-cuda-nvrtc-cu12", specifier = "==12.6.77" },
-    { name = "nvidia-cuda-runtime-cu12", specifier = "==12.6.77" },
-    { name = "nvidia-cudnn-cu12", specifier = "==9.5.1.17" },
-    { name = "nvidia-cufft-cu12", specifier = "==11.3.0.4" },
-    { name = "nvidia-curand-cu12", specifier = "==10.3.7.77" },
-    { name = "nvidia-cusolver-cu12", specifier = "==11.7.1.2" },
-    { name = "nvidia-cusparse-cu12", specifier = "==12.5.4.2" },
-    { name = "nvidia-cusparselt-cu12", specifier = "==0.6.3" },
-    { name = "nvidia-nccl-cu12", specifier = "==2.21.5" },
-    { name = "nvidia-nvjitlink-cu12", specifier = "==12.6.85" },
-    { name = "nvidia-nvtx-cu12", specifier = "==12.6.77" },
-    { name = "torch", specifier = "==2.6.0", index = "https://download.pytorch.org/whl/cu126", conflict = { package = "cosmos-predict2", group = "cu126" } },
-    { name = "torchvision", specifier = "==0.21.0", index = "https://download.pytorch.org/whl/cu126", conflict = { package = "cosmos-predict2", group = "cu126" } },
-    { name = "transformer-engine", specifier = "==1.13", index = "https://nvidia-cosmos.github.io/cosmos-dependencies/cu126_torch260/simple", conflict = { package = "cosmos-predict2", group = "cu126" } },
-]
+provides-extras = ["cu126"]
 
 [[package]]
 name = "coverage"

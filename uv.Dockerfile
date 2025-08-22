@@ -16,9 +16,9 @@
 # Dockerfile using uv environment.
 
 ARG TARGETPLATFORM
-ARG BASE_IMAGE=nvidia/cuda:12.6.0-cudnn-devel-ubuntu20.04
+ARG CUDA_VERSION=12.6.3
 
-FROM ${BASE_IMAGE}
+FROM nvidia/cuda:${CUDA_VERSION}-cudnn-devel-ubuntu24.04
 
 # Set the DEBIAN_FRONTEND environment variable to avoid interactive prompts during apt operations.
 ENV DEBIAN_FRONTEND=noninteractive

@@ -70,7 +70,7 @@ dependencies = [
   "webdataset==0.2.111",
 ]
 
-[dependency-groups]
+[project.optional-dependencies]
 cu126 = [
   "flash-attn==2.6.3",
   "natten==0.21.0",
@@ -100,7 +100,6 @@ homepage = "https://github.com/nvidia-cosmos/cosmos-predict2/"
 issues = "https://github.com/nvidia-cosmos/cosmos-predict2/issues"
 
 [tool.uv]
-default-groups = ["cu126"]
 environments = [
   "python_version == '3.10' and sys_platform == 'linux' and platform_machine == 'x86_64'",
 ]
@@ -112,19 +111,19 @@ no-build-package = [
 
 [tool.uv.sources]
 flash-attn = [
-  { index = "cosmos-cu126", group = "cu126" },
+  { index = "cosmos-cu126", extra = "cu126" },
 ]
 natten = [
-  { index = "cosmos-cu126", group = "cu126" },
+  { index = "cosmos-cu126", extra = "cu126" },
 ]
 transformer-engine = [
-  { index = "cosmos-cu126", group = "cu126" },
+  { index = "cosmos-cu126", extra = "cu126" },
 ]
 torch = [
-  { index = "pytorch-cu126", group = "cu126" },
+  { index = "pytorch-cu126", extra = "cu126" },
 ]
 torchvision = [
-  { index = "pytorch-cu126", group = "cu126" },
+  { index = "pytorch-cu126", extra = "cu126" },
 ]
 
 [[tool.uv.index]]

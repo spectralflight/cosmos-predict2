@@ -26,7 +26,7 @@ The installation will be handled by the Conda scripts or Dockerfile.
 System requirements:
 
 * Linux x86-64
-* glibc>=2.31 (e.g Ubuntu >=20.04)
+* glibc>=2.31 (e.g Ubuntu >=22.04)
 
 Install system dependencies:
 
@@ -39,14 +39,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 Install the package into a new environment:
 
 ```shell
-uv sync
+uv sync --extra cu126
 source .venv/bin/activate
 ```
 
 Or, install the package into the active environment (e.g. conda):
 
 ```shell
-uv sync --active --inexact
+uv sync  --extra cu126 --active --inexact
 ```
 
 ### Option 2: Docker container
@@ -56,14 +56,13 @@ Please make sure you have access to Docker on your machine and the [NVIDIA Conta
 For x86-64, build and run the container:
 
 ```bash
-docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it $(docker build -f uv.Dockerfile .)
+docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it $(docker build -f uv.Dockerfile -q .)
 ```
 
 For arm, pull and run a pre-built container:
 
 ```bash
-docker pull nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2
-docker run --gpus all --rm -v .:/workspace -it cosmos-predict2:1.2
+docker run --gpus all --rm -v .:/workspace -it nvcr.io/nvidia/cosmos/cosmos-predict2-container:1.2
 ```
 
 ## Downloading Checkpoints
