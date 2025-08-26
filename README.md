@@ -1,20 +1,3 @@
----
-jupyter:
-  jupytext:
-    formats: ipynb,md
-    text_representation:
-      extension: .md
-      format_name: markdown
-      format_version: '1.3'
-      jupytext_version: 1.17.0
-  kernelspec:
-    display_name: Python 3
-    language: python
-    name: python3
----
-
-> This document is best viewed as a [Jupyter Notebook](./README.ipynb).
-
 <p align="center">
     <img src="assets/nvidia-cosmos-header.png" alt="NVIDIA Cosmos Header">
 </p>
@@ -45,7 +28,6 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
 * [Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-GR1): Video + Text based future visual world generation, post-trained on GR00T Dreams GR1 dataset
 * [Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID](https://huggingface.co/nvidia/Cosmos-Predict2-14B-Sample-GR00T-Dreams-DROID): Video + Text based future visual world generation, post-trained on GR00T Dreams DROID dataset
 * [Cosmos-Predict2-2B-Sample-Action-Conditioned](https://huggingface.co/nvidia/Cosmos-Predict2-2B-Sample-Action-Conditioned): Video + Action based future visual world generation, post-trained on Bridge dataset
-
 ---
 
 ## Getting Started
@@ -84,20 +66,15 @@ Run example inference scripts:
 
 * [Text2Image](scripts/hf_text2image.py)
 
-```python
-!./scripts/hf_text2image.py output/hf_text2image --prompt "assets/text2image/example_prompt.txt" -v
-from IPython.display import Image
-Image(filename='output/hf_text2image/output.png')
-```
+  ```shell
+  ./scripts/hf_text2image.py output/hf_text2image --prompt "assets/text2image/example_prompt.txt" -v
+  ```
 
 * [Video2World](scripts/hf_video2world.py)
 
-```python
-!./scripts/hf_video2world.py output/hf_video2world --prompt "assets/video2world/example_prompt.txt" --image "assets/video2world/example_input.jpg" -v
-
-from IPython.display import Video
-Video(filename='output/hf_video2world/output.mp4')
-```
+  ```shell
+  ./scripts/hf_video2world.py output/hf_video2world --prompt "assets/video2world/example_prompt.txt" --image "assets/video2world/example_input.jpg" -v
+  ```
 
 ## Quick Start
 
@@ -137,16 +114,13 @@ save_image_or_video(video, "output/test.mp4", fps=16)
 ---
 
 ## User Guide
-
 Our [setup guide](documentations/setup.md) provides complete information on
-
 * [System requirements](documentations/setup.md#system-requirements): Detailed hardware and software prerequisites
 * [Installation](documentations/setup.md#installation): Step-by-step setup with both Conda and Docker options
 * [Downloading checkpoints](documentations/setup.md#downloading-checkpoints): Instructions for obtaining model weights
 * [Troubleshooting](documentations/setup.md#troubleshooting): Solutions for common installation and CUDA compatibility issues
 
 For inference examples and usage
-
 * **[Text2Image Inference](documentations/inference_text2image.md)**: Guide for generating high-quality images from text prompts
 * **[Video2World Inference](documentations/inference_video2world.md)**: Guide for generating videos from images/videos with text prompts, including:
   * Single and batch processing
@@ -159,7 +133,6 @@ For inference examples and usage
   * Multi-GPU inference for faster generation
 
 For post-training customization
-
 * **[Video2World Post-training guide](documentations/post-training_video2world.md)**: General guide to the video2world training system in the codebase.
 * **[Video2World Post-training on Cosmos-NeMo-Assets](documentations/post-training_video2world_cosmos_nemo_assets.md)**: Case study for post-training on Cosmos-NeMo-Assets data
 * **[Video2World Post-training on fisheye-view AgiBotWorld-Alpha dataset](documentations/post-training_video2world_agibot_fisheye.md)**: Case study for post-training on fisheye-view robot videos from AgiBotWorld-Alpha dataset.
@@ -169,7 +142,6 @@ For post-training customization
 * **[Text2Image Post-training on Cosmos-NeMo-Assets](documentations/post-training_text2image_cosmos_nemo_assets.md)**: Case study for post-training on Cosmos-NeMo-Assets image data.
 
 Our [performance guide](documentations/performance.md) includes
-
 * [Hardware requirements](documentations/performance.md#hardware-requirements): Recommended GPU configurations and memory requirements
 * [Performance benchmarks](documentations/performance.md#performance-benchmarks): Detailed speed and quality comparisons across different GPU architectures
 * [Model selection guide](documentations/performance.md#model-selection-guide): Practical advice for choosing between 2B and 14B variants based on your needs
