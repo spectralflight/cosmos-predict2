@@ -21660,13 +21660,13 @@ HEREUNDER IS ON AN "AS IS" BASIS, AND THE UNIVERSITY OF NORTH CAROLINA AT
 CHAPEL HILL HAS NO OBLIGATIONS TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
 ENHANCEMENTS, OR MODIFICATIONS.
 
-The authors may be contacted via:  
+The authors may be contacted via:
 
 US Mail:             Eric Larsen, Stefan Gottschalk
                       Department of Computer Science
                       Sitterson Hall, CB #3175
                       University of North Carolina
-                      Chapel Hill, NC 27599-3175  
+                      Chapel Hill, NC 27599-3175
 
 Phone:               (919) 962-1749
 
