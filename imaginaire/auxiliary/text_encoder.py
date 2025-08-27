@@ -16,7 +16,7 @@
 import abc
 import functools
 from enum import Enum
-from typing import Any, ClassVar, Literal, TypeAlias, assert_never, overload
+from typing import Any, ClassVar, Literal, TypeAlias, overload
 
 import attrs
 import torch
@@ -25,12 +25,13 @@ from torch import nn
 from torch.distributed.checkpoint.state_dict import StateDictOptions, get_model_state_dict, set_model_state_dict
 from torch.distributed.checkpoint.stateful import Stateful
 from transformers import T5EncoderModel, T5TokenizerFast
-from typing_extensions import Self, override
+from typing_extensions import Self, assert_never, override
 
 from imaginaire.configs.reason1.model_config_qwen import QwenModelConfig, QwenVisionConfig
 from imaginaire.constants import COSMOS_REASON1_PRIVATE_CHECKPOINT, T5_MODEL_DIR, TEXT_ENCODER_CLASS, TextEncoderClass
 from imaginaire.lazy_config import LazyCall as L
 from imaginaire.lazy_config import instantiate as lazy_instantiate
+from imaginaire.models.utils import load_state_dict
 from imaginaire.models.vlm_qwen import build_tokenizer
 from imaginaire.models.vlm_qwen_omni import QwenVLBaseModel
 from imaginaire.utils import log
@@ -147,6 +148,7 @@ class CosmosReason1TextEncoder(CosmosTextEncoderBase):
     ):
         super().__init__()
         self.config = config
+        self.device = device
 
         log.info("Instantiating text encoder model...")
         with torch.device("meta"):
@@ -161,33 +163,33 @@ class CosmosReason1TextEncoder(CosmosTextEncoderBase):
 
     @staticmethod
     def load_checkpoint(
-        model_parts: list[nn.Module],
+        model: nn.Module,
         ckpt_path: str,
-        model_ckpt_key_map: dict[str, str] = {},  # noqa: B006
     ):
         log.info(f"Loading checkpoint from {ckpt_path}.")
-
-        _model_wrapper = ModelWrapper(model_parts)
-        state_dict = _model_wrapper.state_dict()
+        is_fsdp = False
+        if torch.distributed.is_initialized():
+            torch.distributed.barrier()
+            is_fsdp = torch.distributed.get_world_size() > 1
+        state_dict = load_state_dict(ckpt_path)
         # remove _extra_state
         state_dict = {k: v for k, v in state_dict.items() if not k.endswith("._extra_state")}
 
-        # remap keys if needed
-        if model_ckpt_key_map:
-            for model_key, checkpoint_key in model_ckpt_key_map.items():
-                state_dict[checkpoint_key] = state_dict.pop(model_key)
-                log.info(f"Re-mapping {model_key} to {checkpoint_key}")
+        # Load Regular weights.
+        if is_fsdp:
+            set_model_state_dict(
+                model,
+                state_dict,
+                options=StateDictOptions(
+                    full_state_dict=True,
+                    broadcast_from_rank0=True,
+                    strict=False,
+                ),
+            )
+        else:
+            model.load_state_dict(state_dict, strict=False)
 
-        state_dict = torch.load(ckpt_path)
-
-        # inverse the remapping if needed
-        if model_ckpt_key_map:
-            for model_key, checkpoint_key in model_ckpt_key_map.items():
-                state_dict[model_key] = state_dict.pop(checkpoint_key)
-                log.info(f"Inverse re-mapping {checkpoint_key} to {model_key}")
-
-        _model_wrapper.load_state_dict(state_dict)
-
+        del state_dict
         log.info(f"Finished loading checkpoint from {ckpt_path}.")
 
     @staticmethod
@@ -255,6 +257,7 @@ class CosmosReason1TextEncoder(CosmosTextEncoderBase):
 
         input_ids_batch = torch.stack(input_ids_batch, dim=0)
 
+        self.model = self.model.to(self.device)
         # Compute text embeddings
         with torch.no_grad():
             _, outputs_batch = self.model(input_ids_batch, {})

@@ -216,7 +216,7 @@ class Text2ImagePipeline(BasePipeline):
         return self.dit
 
     def encode_prompt(
-        self, prompts: str | list[str], max_length: int = CosmosTextEncoderConfig.NUM_TOKENS, return_mask: bool = False
+        self, prompts: str | list[str], max_length: int | None = None, return_mask: bool = False
     ) -> torch.Tensor:
         return self.text_encoder.encode_prompts(prompts, max_length=max_length, return_mask=return_mask)  # type: ignore
 

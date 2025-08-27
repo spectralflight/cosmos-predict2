@@ -121,6 +121,7 @@ def setup_pipeline(args: argparse.Namespace, text_encoder: CosmosTextEncoder | N
     config.prompt_refiner_config.offload_model_to_cpu = args.offload_prompt_refiner
 
     # Load models
+    log.info(f"Using config: {config}")
     log.info(f"Initializing MultiviewPipeline with model size: {args.model_size}")
     pipe = MultiviewPipeline.from_config(
         config=config,
@@ -379,6 +380,11 @@ def parse_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
+    # HACK
+    os.environ["NVTE_FUSED_ATTN"] = "0"
+    torch.backends.cudnn.benchmark = False
+    torch.backends.cudnn.deterministic = True
+
     args = parse_args()
     try:
         pipe = setup_pipeline(args)
