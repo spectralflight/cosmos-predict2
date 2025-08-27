@@ -17,9 +17,6 @@
 import torch
 import torchvision.transforms.functional as F
 
-from imaginaire.constants import TEXT_ENCODER_EMBED_DIM as _T5_EMBED_DIM  # noqa
-from imaginaire.constants import TEXT_ENCODER_NUM_TOKENS as _NUM_T5_TOKENS  # noqa
-
 
 class Resize_Preprocess:
     def __init__(self, size: tuple[int, int]):

@@ -20,7 +20,7 @@ import pickle
 import numpy as np
 
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder, CosmosT5TextEncoderConfig
-from imaginaire.constants import T5_MODEL_DIR, T5_TEXT_ENCODER_NUM_TOKENS
+from imaginaire.constants import T5_MODEL_DIR
 
 """example command
 python -m scripts.get_t5_embeddings_from_cosmos_nemo_assets --dataset_path datasets/cosmos_nemo_assets
@@ -35,7 +35,9 @@ def parse_args() -> argparse.ArgumentParser:
         default="datasets/cosmos_nemo_assets",
         help="Root path to the dataset",
     )
-    parser.add_argument("--max_length", type=int, default=T5_TEXT_ENCODER_NUM_TOKENS, help="Maximum length of the text embedding")
+    parser.add_argument(
+        "--max_length", type=int, help="Maximum length of the text embedding"
+    )
     parser.add_argument("--prompt", type=str, default="A video of sks teal robot.", help="Text prompt for the dataset")
     parser.add_argument("--cache_dir", type=str, default=T5_MODEL_DIR, help="Directory to cache the T5 model")
     parser.add_argument("--is_image", action="store_true", help="Set if the dataset is image-based")
@@ -77,9 +79,8 @@ def main(args) -> None:
 
     # Compute T5 embeddings
     print(f"Computing T5 embeddings for the prompt: {args.prompt}")
-    max_length = args.max_length
     encoded_text, mask_bool = encoder.encode_prompts(
-        args.prompt, max_length=max_length, return_mask=True
+        args.prompt, max_length=args.max_length, return_mask=True
     )  # list of np.ndarray in (len, 1024)
     attn_mask = mask_bool.long()
     lengths = attn_mask.sum(dim=1).cpu()

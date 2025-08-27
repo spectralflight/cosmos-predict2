@@ -302,7 +302,7 @@ def parse_args() -> argparse.Namespace:
         "--prompt",
         type=str,
         default="",
-        help="Text prompt for video generation. Can be a text file with one prompt per line for each view,  or a .pt file with text embeddings of shape (1, num_views*TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM)",
+        help="Text prompt for video generation. Can be a text file with one prompt per line for each view,  or a .pt file with text embeddings of shape (1, num_views*num_tokens, embed_dim)",
     )
     parser.add_argument(
         "--input_path",

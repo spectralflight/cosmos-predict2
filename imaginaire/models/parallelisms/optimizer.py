@@ -28,6 +28,7 @@ from torch.optim.lr_scheduler import LambdaLR
 from imaginaire.configs.reason1.model_config import FSDP2ModelConfig
 from imaginaire.utils import log
 
+
 def _optimizer_cls(params: list[nn.Parameter], optimizer_kwargs: dict[str, Any], name: str):
     if name == "Adam":
         # TODO: make the optimizer options configurable by toml/cmd args
@@ -36,6 +37,7 @@ def _optimizer_cls(params: list[nn.Parameter], optimizer_kwargs: dict[str, Any],
         optimizer = torch.optim.AdamW(params, **optimizer_kwargs)
     elif name == "FusedAdam":
         from imaginaire.utils.fused_adam import FusedAdam
+
         optimizer = FusedAdam(
             params,
             lr=optimizer_kwargs["lr"],

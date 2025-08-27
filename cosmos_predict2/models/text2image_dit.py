@@ -40,7 +40,7 @@ from cosmos_predict2.module.neighborhood_attn import NeighborhoodAttention
 from cosmos_predict2.networks.model_weights_stats import WeightTrainingStat
 from cosmos_predict2.networks.selective_activation_checkpoint import SACConfig as _SACConfig
 from cosmos_predict2.utils.context_parallel import split_inputs_cp
-from imaginaire.constants import COSMOS_REASON1_TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_CLASS, TextEncoderClass
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoderConfig
 from imaginaire.utils import log
 from imaginaire.utils.graph import create_cuda_graph
 
@@ -1175,7 +1175,7 @@ class MiniTrainDIT(WeightTrainingStat):
         atten_backend: str = "transformer_engine",
         # cross attention settings
         crossattn_emb_channels: int = 1024,
-        crossattn_proj_in_channels: int = COSMOS_REASON1_TEXT_ENCODER_EMBED_DIM,
+        crossattn_proj_in_channels: int = CosmosTextEncoderConfig.EMBED_DIM,
         # positional embedding settings
         pos_emb_cls: str = "sincos",
         pos_emb_learnable: bool = False,

@@ -27,7 +27,6 @@ from megatron.core import parallel_state
 from torch.distributed import get_process_group_ranks
 from tqdm import tqdm
 
-from imaginaire.constants import TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_NUM_TOKENS
 from cosmos_predict2.auxiliary.cosmos_reason1 import CosmosReason1
 from cosmos_predict2.conditioner import DataType, TextCondition
 from cosmos_predict2.configs.base.config_multiview import (
@@ -45,7 +44,7 @@ from cosmos_predict2.utils.context_parallel import (
     cat_outputs_cp,
     split_inputs_cp,
 )
-from imaginaire.auxiliary.text_encoder import get_cosmos_text_encoder
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoderConfig, get_cosmos_text_encoder
 from imaginaire.lazy_config import instantiate
 from imaginaire.utils import log, misc
 from imaginaire.utils.easy_io import easy_io
@@ -320,7 +319,9 @@ class MultiviewPipeline(Video2WorldPipeline):
             dict: A dictionary containing the prepared data batch, moved to the correct device and dtype.
         """
         B, C, T, H, W = video.shape
-        t5_text_embeddings = torch.zeros(B, n_views * TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=self.torch_dtype).to(self.device)
+        t5_text_embeddings = torch.zeros(
+            B, n_views * CosmosTextEncoderConfig.NUM_TOKENS, CosmosTextEncoderConfig.EMBED_DIM, dtype=self.torch_dtype
+        ).to(self.device)
         if prompt.endswith(".txt"):
             prompts = open(prompt).read().splitlines()
             assert len(prompts) == n_views, (
@@ -331,16 +332,18 @@ class MultiviewPipeline(Video2WorldPipeline):
                     log.info(f"prompt for view {i} will not be used, skipping")
                     continue
                 log.info(f"{i}. encode prompt: {prompt}")
-                t5_text_embeddings[:, i * TEXT_ENCODER_NUM_TOKENS : (i + 1) * TEXT_ENCODER_NUM_TOKENS] = (
-                    self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
-                )
+                t5_text_embeddings[
+                    :, i * CosmosTextEncoderConfig.NUM_TOKENS : (i + 1) * CosmosTextEncoderConfig.NUM_TOKENS
+                ] = self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
         elif prompt.endswith(".pt"):
             t5_text_embeddings = torch.load(prompt)
-            assert t5_text_embeddings.shape[1] == n_views * TEXT_ENCODER_NUM_TOKENS, (
-                f"t5_text_embeddings.shape[1] {t5_text_embeddings.shape[1]} should be {n_views * TEXT_ENCODER_NUM_TOKENS}"
+            assert t5_text_embeddings.shape[1] == n_views * CosmosTextEncoderConfig.NUM_TOKENS, (
+                f"t5_text_embeddings.shape[1] {t5_text_embeddings.shape[1]} should be {n_views * CosmosTextEncoderConfig.NUM_TOKENS}"
             )
         else:
-            t5_text_embeddings[:, 0:TEXT_ENCODER_NUM_TOKENS] = self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
+            t5_text_embeddings[:, 0 : CosmosTextEncoderConfig.NUM_TOKENS] = (
+                self.encode_prompt(prompt).to(dtype=self.torch_dtype).to(self.device)
+            )
         latent_view_indices_T = torch.repeat_interleave(torch.arange(n_views), self.config.state_t)
         latent_view_indices_B_T = latent_view_indices_T.unsqueeze(0).expand(B, -1).to(self.device)
 
@@ -359,8 +362,15 @@ class MultiviewPipeline(Video2WorldPipeline):
         # Handle negative prompts for classifier-free guidance
         if negative_prompt:
             log.warning("Negative prompt is only applied to the first view")
-            neg_t5_text_embeddings = torch.zeros(B, n_views * TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=self.torch_dtype).to(self.device)
-            neg_t5_text_embeddings[:, 0:TEXT_ENCODER_NUM_TOKENS] = self.encode_prompt(negative_prompt).to(dtype=self.torch_dtype)
+            neg_t5_text_embeddings = torch.zeros(
+                B,
+                n_views * CosmosTextEncoderConfig.NUM_TOKENS,
+                CosmosTextEncoderConfig.EMBED_DIM,
+                dtype=self.torch_dtype,
+            ).to(self.device)
+            neg_t5_text_embeddings[:, 0 : CosmosTextEncoderConfig.NUM_TOKENS] = self.encode_prompt(negative_prompt).to(
+                dtype=self.torch_dtype
+            )
             data_batch["neg_t5_text_embeddings"] = neg_t5_text_embeddings
 
         # Move tensors to GPU and convert to bfloat16 if they are floating point

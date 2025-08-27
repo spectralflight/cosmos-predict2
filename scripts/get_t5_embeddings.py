@@ -20,7 +20,7 @@ import pickle
 import numpy as np
 
 from imaginaire.auxiliary.text_encoder import CosmosT5TextEncoder, CosmosT5TextEncoderConfig
-from imaginaire.constants import T5_MODEL_DIR, T5_TEXT_ENCODER_NUM_TOKENS
+from imaginaire.constants import T5_MODEL_DIR
 
 """example command
 python -m scripts.get_t5_embeddings --dataset_path datasets/hdvila
@@ -30,7 +30,11 @@ python -m scripts.get_t5_embeddings --dataset_path datasets/hdvila
 def parse_args() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Compute T5 embeddings for text prompts")
     parser.add_argument("--dataset_path", type=str, default="datasets/hdvila", help="Root path to the dataset")
-    parser.add_argument("--max_length", type=int, default=T5_TEXT_ENCODER_NUM_TOKENS, help="Maximum length of the text embedding")
+    parser.add_argument(
+        "--max_length",
+        type=int,
+        help="Maximum length of the text embedding",
+    )
     parser.add_argument("--cache_dir", type=str, default=T5_MODEL_DIR, help="Directory to cache the T5 model")
     return parser.parse_args()
 
@@ -58,10 +62,9 @@ def main(args) -> None:
             prompt = fp.read().strip()
 
         # Compute T5 embeddings
-        max_length = args.max_length
         encoded_text, mask_bool = encoder.encode_prompts(
-            prompt, max_length=max_length, return_mask=True
-        )  # list of np.ndarray in (len, TEXT_ENCODER_EMBED_DIM)
+            prompt, max_length=args.max_length, return_mask=True
+        )  # list of np.ndarray in (len, embed_dim)
         attn_mask = mask_bool.long()
         lengths = attn_mask.sum(dim=1).cpu()
 

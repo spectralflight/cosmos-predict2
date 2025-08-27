@@ -26,7 +26,6 @@ import warnings
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import imageio
-from imaginaire.constants import TEXT_ENCODER_EMBED_DIM, TEXT_ENCODER_NUM_TOKENS
 import numpy as np
 import torch
 from einops import rearrange
@@ -40,6 +39,7 @@ from cosmos_predict2.data.action_conditioned.dataset_utils import (
     euler2rotm,
     rotm2euler,
 )
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoderConfig
 
 
 class ActionConditionedDataset(Dataset):
@@ -368,8 +368,10 @@ class ActionConditionedDataset(Dataset):
                 t5_embeddings = np.squeeze(np.load(ann_file.replace(".json", ".npy")))
                 data["t5_text_embeddings"] = torch.from_numpy(t5_embeddings).cuda()
             else:
-                data["t5_text_embeddings"] = torch.zeros(TEXT_ENCODER_NUM_TOKENS, TEXT_ENCODER_EMBED_DIM, dtype=torch.bfloat16).cuda()
-            data["t5_text_mask"] = torch.ones(TEXT_ENCODER_NUM_TOKENS, dtype=torch.int64).cuda()
+                data["t5_text_embeddings"] = torch.zeros(
+                    CosmosTextEncoderConfig.NUM_TOKENS, CosmosTextEncoderConfig.EMBED_DIM, dtype=torch.bfloat16
+                ).cuda()
+            data["t5_text_mask"] = torch.ones(CosmosTextEncoderConfig.NUM_TOKENS, dtype=torch.int64).cuda()
             data["fps"] = 4
             data["image_size"] = 256 * torch.ones(4).cuda()  # TODO: Does this matter?
             data["num_frames"] = self.sequence_length
