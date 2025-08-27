@@ -702,7 +702,7 @@ class MultiviewPipeline(Video2WorldPipeline):
         ]
 
         x0_fn = self.get_x0_fn_from_batch(
-            data_batch, guidance, is_negative_prompt=True, use_cuda_graphs=use_cuda_graphs
+            data_batch, guidance, is_negative_prompt=bool(negative_prompt), use_cuda_graphs=use_cuda_graphs
         )
 
         log.info("Starting video generation...")
