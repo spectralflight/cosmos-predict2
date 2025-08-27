@@ -47,7 +47,7 @@ log.debug(f"Cosmos Predict2 args: {_args}")
 TEXT_ENCODER_CLASS: TextEncoderClass = _args.text_encoder
 
 # Checkpoints
-CHECKPOINTS_DIR = _args.checkpoints
+CHECKPOINTS_DIR: str = _args.checkpoints
 
 T5_MODEL_DIR = f"{CHECKPOINTS_DIR}/google-t5/t5-11b"
 

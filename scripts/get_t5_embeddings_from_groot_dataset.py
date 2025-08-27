@@ -36,9 +36,7 @@ def parse_args() -> argparse.ArgumentParser:
     parser.add_argument(
         "--prompt_prefix", type=str, default="The robot arm is performing a task. ", help="Prefix of the prompt"
     )
-    parser.add_argument(
-        "--max_length", type=int, help="Maximum length of the text embedding"
-    )
+    parser.add_argument("--max_length", type=int, help="Maximum length of the text embedding")
     parser.add_argument("--cache_dir", type=str, default=T5_MODEL_DIR, help="Directory to cache the T5 model")
     parser.add_argument(
         "--meta_csv", type=str, default="datasets/benchmark_train/gr1/metadata.csv", help="Metadata csv file"

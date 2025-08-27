@@ -35,9 +35,7 @@ def parse_args() -> argparse.ArgumentParser:
         default="datasets/cosmos_nemo_assets",
         help="Root path to the dataset",
     )
-    parser.add_argument(
-        "--max_length", type=int, help="Maximum length of the text embedding"
-    )
+    parser.add_argument("--max_length", type=int, help="Maximum length of the text embedding")
     parser.add_argument("--prompt", type=str, default="A video of sks teal robot.", help="Text prompt for the dataset")
     parser.add_argument("--cache_dir", type=str, default=T5_MODEL_DIR, help="Directory to cache the T5 model")
     parser.add_argument("--is_image", action="store_true", help="Set if the dataset is image-based")
