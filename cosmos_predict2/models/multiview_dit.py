@@ -414,6 +414,9 @@ class MultiViewDiT(MinimalV1LVGDiT):
             view_indices_B_T=view_indices_B_T,
         )
 
+        if self.crossattn_proj is not None:
+            crossattn_emb = self.crossattn_proj(crossattn_emb)
+
         if timesteps_B_T.ndim == 1:
             timesteps_B_T = timesteps_B_T.unsqueeze(1)
         t_embedding_B_T_D, adaln_lora_B_T_3D = self.t_embedder(timesteps_B_T)
