@@ -40,7 +40,7 @@ just release-check
 
 Commit any changes.
 
-Release to PyPI:
+Release to PyPI (omit `<pypi_token>` to dry-run):
 
 ```shell
 just release <pypi_token>
