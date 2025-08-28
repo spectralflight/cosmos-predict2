@@ -25,8 +25,12 @@ ignore_package_licenses := "nvidia-* hf-xet certifi filelock matplotlib typing-e
 license: install
   uvx licensecheck --show-only-failing --only-licenses {{allow_licenses}} --ignore-packages {{ignore_package_licenses}} --zero
   uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.md
-  pre-commit run --all-files trailing-whitespace || true
-  pre-commit run --all-files end-of-file-fixer || true
+  pre-commit run --files ATTRIBUTIONS.md || true
+
+# Pre-release checks
+release-check:
+  just license
+  pre-commit run --all-files --hook-stage manual
 
 # Release a new version
 release pypi_token='dry-run' *args:
@@ -39,7 +43,7 @@ docker-build cuda_version='12.6.3' *args:
 # Run the docker container
 docker cuda_version='12.6.3' *args:
   # https://github.com/astral-sh/uv-docker-example/blob/main/run.sh
-  just -f {{justfile()}} docker-build "{{cuda_version}}"
+  just docker-build "{{cuda_version}}"
   docker run --gpus all --rm -v .:/workspace -v /workspace/.venv -it cosmos-predict2:{{cuda_version}} {{args}}
 
 # Run the arm docker container
