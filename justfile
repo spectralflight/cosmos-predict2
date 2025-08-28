@@ -17,10 +17,16 @@ lint: setup
 # Run tests
 test: lint
 
+# https://spdx.org/licenses/
+allow_licenses := "MIT BSD-2-CLAUSE BSD-3-CLAUSE APACHE-2.0 ISC"
+ignore_package_licenses := "nvidia-* hf-xet certifi filelock matplotlib typing-extensions"
+
 # Update the license
 license: install
-  uvx licensecheck --show-only-failing --ignore-packages "nvidia-*" "hf-xet" --zero
+  uvx licensecheck --show-only-failing --only-licenses {{allow_licenses}} --ignore-packages {{ignore_package_licenses}} --zero
   uvx pip-licenses --python .venv/bin/python --format=plain-vertical --with-license-file --no-license-path --no-version --with-urls --output-file ATTRIBUTIONS.md
+  pre-commit run --all-files trailing-whitespace || true
+  pre-commit run --all-files end-of-file-fixer || true
 
 # Release a new version
 release pypi_token='dry-run' *args:
