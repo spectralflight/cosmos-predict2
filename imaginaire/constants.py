@@ -19,9 +19,26 @@ import argparse
 import enum
 import os
 import shlex
+import subprocess
+import sys
 from typing import Literal
 
-from imaginaire.utils import log
+
+def print_environment_info(args: argparse.Namespace):
+    from imaginaire.utils import log
+
+    try:
+        git_branch = subprocess.check_output("git rev-parse --abbrev-ref HEAD", shell=True, text=True).strip()
+        git_revision = subprocess.check_output("git rev-parse HEAD", shell=True, text=True).strip()
+        log.info(f"git.branch: {git_branch}")
+        log.info(f"git.revision: {git_revision}")
+    except Exception:
+        pass
+
+    # Don't print environment variables, since it can contain sensitive information.
+    log.info(f"imaginaire.constants: {_args}")
+    log.info(f"sys.argv: {sys.argv}")
+    log.info(f"args: {args}")
 
 
 class TextEncoderClass(str, enum.Enum):
@@ -40,7 +57,6 @@ _parser.add_argument(
 )
 _args = shlex.split(os.environ.get("COSMOS_PREDICT2_ARGS", ""))
 _args = _parser.parse_args(_args)
-log.debug(f"Cosmos Predict2 args: {_args}")
 
 
 # Feature flags
