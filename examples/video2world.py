@@ -16,8 +16,10 @@
 import argparse
 import json
 import os
+import sys
 
 from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
+import imaginaire.constants
 from imaginaire.constants import (
     CosmosPredict2Video2WorldAspectRatio,
     CosmosPredict2Video2WorldFPS,
@@ -245,6 +247,12 @@ def setup_pipeline(args: argparse.Namespace, text_encoder: CosmosTextEncoder | N
         config.prompt_refiner_config.enabled = False
     config.prompt_refiner_config.offload_model_to_cpu = args.offload_prompt_refiner
 
+    # HACK
+    log.info(f"constants: {imaginaire.constants._args}")
+    log.info(f"git.branch: {os.system('git rev-parse --abbrev-ref HEAD')}")
+    log.info(f"git.revision: {os.system('git rev-parse HEAD')}")
+    log.info(f"sys.argv: {sys.argv}")
+    log.info(f"args: {args}")
     output_path = os.path.splitext(args.save_path)[0]
     output_dir = os.path.dirname(output_path)
     if output_dir:
