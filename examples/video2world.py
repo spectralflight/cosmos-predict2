@@ -17,6 +17,7 @@ import argparse
 import json
 import os
 import sys
+import subprocess
 
 from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
 import imaginaire.constants
@@ -249,8 +250,8 @@ def setup_pipeline(args: argparse.Namespace, text_encoder: CosmosTextEncoder | N
 
     # HACK
     log.info(f"constants: {imaginaire.constants._args}")
-    log.info(f"git.branch: {os.system('git rev-parse --abbrev-ref HEAD')}")
-    log.info(f"git.revision: {os.system('git rev-parse HEAD')}")
+    log.info(f"git.branch: {subprocess.check_output('git rev-parse --abbrev-ref HEAD', shell=True, text=True).strip()}")
+    log.info(f"git.revision: {subprocess.check_output('git rev-parse HEAD', shell=True, text=True).strip()}")
     log.info(f"sys.argv: {sys.argv}")
     log.info(f"args: {args}")
     output_path = os.path.splitext(args.save_path)[0]
