@@ -16,11 +16,11 @@
 import argparse
 import json
 import os
-import sys
 import subprocess
+import sys
 
-from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
 import imaginaire.constants
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
 from imaginaire.constants import (
     CosmosPredict2Video2WorldAspectRatio,
     CosmosPredict2Video2WorldFPS,

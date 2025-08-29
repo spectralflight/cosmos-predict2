@@ -19,8 +19,8 @@ import os
 import subprocess
 import sys
 
-from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
 import imaginaire.constants
+from imaginaire.auxiliary.text_encoder import CosmosTextEncoder
 from imaginaire.constants import (
     CosmosPredict2MultiviewFPS,
     CosmosPredict2MultiviewModelSize,
