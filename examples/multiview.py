@@ -121,7 +121,6 @@ def setup_pipeline(args: argparse.Namespace, text_encoder: CosmosTextEncoder | N
     config.prompt_refiner_config.offload_model_to_cpu = args.offload_prompt_refiner
 
     # Load models
-    log.info(f"Using config: {config}")
     log.info(f"Initializing MultiviewPipeline with model size: {args.model_size}")
     pipe = MultiviewPipeline.from_config(
         config=config,
@@ -302,8 +301,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--prompt",
         type=str,
-        default='The video opens with a view from inside a vehicle, positioned at an intersection under a clear blue sky. The camera angle is from the dashboard, offering a first-person perspective of the road ahead. The intersection is marked by multiple traffic lights and street signs, including one that reads "E Garden Blvd." A white van with "TM Stuckateur" branding is seen driving through the intersection, heading in the same direction as the viewer\'s vehicle. Other cars are also present, moving smoothly along the multi-lane road. As the vehicle starts to move forward, the camera pans slightly to the right, revealing more of the surroundings. The road is lined with trees on both sides, providing a natural canopy that filters the sunlight. The trees are lush and green, indicating it might be spring or summer. On the left side of the road, there is a large building with a sign that reads "GROCERY OUTLET," suggesting the presence of a retail store nearby. Further down the road, additional buildings and residential structures can be seen, hinting at a suburban or semi-urban area. The sun is bright and high in the sky, casting long shadows across the road. The light creates a warm, inviting atmosphere, enhancing the clarity of the scene. The road itself is well-maintained, with clear lane markings and directional arrows painted on the asphalt. Overhead, power lines run parallel to the road, supported by poles that also hold traffic lights and street lamps. As the vehicle continues its journey, the camera maintains a steady focus on the road ahead, capturing the smooth flow of traffic and the serene environment. The absence of heavy traffic or congestion adds to the tranquil mood of the scene. The overall ambiance is one of calm and order, with the interplay of natural and man-made elements creating a harmonious urban landscape. The gentle curve of the road and the soft glow of the setting sun add a sense of peacefulness to the drive, making the viewer feel as though they are part of this quiet, picturesque neighborhood.',
-        help="Text prompt for video generation. Can be a text file with one prompt per line for each view,  or a .pt file with text embeddings of shape (1, num_views*num_tokens, embed_dim)",
+        default="",
+        help="Text prompt for video generation. Can be a text file with one prompt per line for each view,  or a .pt file with text embeddings of shape (1, num_views*512, 1024)",
     )
     parser.add_argument(
         "--input_path",
@@ -314,7 +313,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--negative_prompt",
         type=str,
-        default="",
+        default=_DEFAULT_NEGATIVE_PROMPT,
         help="Negative text prompt for video-to-world generation",
     )
     parser.add_argument(
@@ -380,11 +379,6 @@ def parse_args() -> argparse.Namespace:
 
 
 if __name__ == "__main__":
-    # HACK
-    os.environ["NVTE_FUSED_ATTN"] = "0"
-    torch.backends.cudnn.benchmark = False
-    torch.backends.cudnn.deterministic = True
-
     args = parse_args()
     try:
         pipe = setup_pipeline(args)
