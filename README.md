@@ -12,10 +12,7 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
     <img src="assets/cosmos-predict-diagram.png" alt="Cosmos-Predict Architecture Diagram" width=80%>
 </p>
 
-<video width="640" height="480" controls>
-  <source src="https://release-assets.githubusercontent.com/github-production-release-asset/1041087655/40b564d7-241d-43e2-b369-e5a9d461c69d?sp=r&sv=2018-11-09&sr=b&spr=https&se=2025-10-02T05%3A51%3A35Z&rscd=attachment%3B+filename%3Drobot_welding.mp4&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2025-10-02T04%3A51%3A23Z&ske=2025-10-02T05%3A51%3A35Z&sks=b&skv=2018-11-09&sig=aSWahdDKNw%2BTm3h969bdKyZxYfFaXN6KNTIBtyDTI3g%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc1OTM4MTQyMiwibmJmIjoxNzU5MzgxMTIyLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.1x86mIWtheHEdtWdnTZ4Kz9Vdr-tU1r3PccXa5TnRC8&response-content-disposition=attachment%3B%20filename%3Drobot_welding.mp4&response-content-type=application%2Foctet-stream#" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<video src="https://release-assets.githubusercontent.com/github-production-release-asset/1041087655/40b564d7-241d-43e2-b369-e5a9d461c69d?sp=r&sv=2018-11-09&sr=b&spr=https&se=2025-10-02T05%3A51%3A35Z&rscd=attachment%3B+filename%3Drobot_welding.mp4&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2025-10-02T04%3A51%3A23Z&ske=2025-10-02T05%3A51%3A35Z&sks=b&skv=2018-11-09&sig=aSWahdDKNw%2BTm3h969bdKyZxYfFaXN6KNTIBtyDTI3g%3D&jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc1OTM4MTQyMiwibmJmIjoxNzU5MzgxMTIyLCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.1x86mIWtheHEdtWdnTZ4Kz9Vdr-tU1r3PccXa5TnRC8&response-content-disposition=attachment%3B%20filename%3Drobot_welding.mp4&response-content-type=application%2Foctet-stream#" width="500" controls></video>
 
 ## News
 * 2025-08-22: Cosmos-Predict2 is now available on [PyPI](https://pypi.org/project/cosmos-predict2/)! See [Getting Started](#getting-started) for usage.
