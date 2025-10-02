@@ -12,6 +12,11 @@ We visualize the architecture of Cosmos-Predict2 in the following figure.
     <img src="assets/cosmos-predict-diagram.png" alt="Cosmos-Predict Architecture Diagram" width=80%>
 </p>
 
+<video width="640" height="480" controls>
+  <source src="https://github.com/nvidia-cosmos/cosmos-dependencies/releases/download/assets/robot_welding.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ## News
 * 2025-08-22: Cosmos-Predict2 is now available on [PyPI](https://pypi.org/project/cosmos-predict2/)! See [Getting Started](#getting-started) for usage.
 * 2025-08-21: Cosmos-Predict2 now has pre-built dependencies! See [Setup Guide](documentations/setup.md).
